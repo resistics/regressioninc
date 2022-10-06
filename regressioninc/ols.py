@@ -26,6 +26,10 @@ class LeastSquares(LinearRegressor):
 
 
 class WeightedLeastSquares(LinearRegressor):
+    """
+    Perform weighted least-squares
+    """
+    
     def fit(self, X: np.ndarray, y: np.ndarray, weights: np.ndarray):
         return
 

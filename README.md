@@ -1,3 +1,3 @@
-# Regression in C
+# RegressionInC
 
 A package focussing on regression for complex-valued variables
