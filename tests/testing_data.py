@@ -25,6 +25,6 @@ def linear_complex(coef: np.ndarray, intercept: Optional[complex] = None):
     shape = (n_samples, n_features)
     # generate the data
     X = np.random.uniform(-20, 20, size=shape)
-    X += 1.0j * np.random.uniform(-20, 20, size=shape)
+    X = X.astype(complex) + 1.0j * np.random.uniform(-20, 20, size=shape)
     y = np.matmul(X, coef) + intercept
     return X, y

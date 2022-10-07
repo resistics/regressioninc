@@ -57,8 +57,14 @@ class LinearRegressor(Regressor):
 
     coef: Optional[np.ndarray] = None
     """The coefficients"""
+    residuals: Optional[np.ndarray] = None
+    """The square residuals"""
+    rank: Optional[int] = None
+    """The rank of the predictors"""
+    singular: Optional[np.ndarray] = None
+    """The singular values of the predictors"""
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Fit the linear model"""
         raise NotImplementedError("fit is not implemented in the base class")
 
