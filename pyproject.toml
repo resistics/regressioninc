@@ -37,3 +37,29 @@ pytest-html = "^3.1.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
+doctest_optionflags = "NORMALIZE_WHITESPACE ELLIPSIS"
+minversion = "6.0"
+testpaths = ["regressioninc", "tests"]
+
+[tool.coverage.paths]
+source = ["regressioninc"]
+
+[tool.coverage.run]
+branch = true
+source = ["regressioninc"]
+
+[tool.coverage.report]
+show_missing = false
+
+[tool.coverage.html]
+directory = "artifacts/coverage_html"
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
