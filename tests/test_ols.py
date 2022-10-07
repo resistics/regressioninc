@@ -77,11 +77,11 @@ def test_WeightedLeastSquares_real(coef: List[float], intercept: float):
     from sklearn.linear_model import LinearRegression
 
     np.random.seed(42)
-    
+
     X, y = linear_real(np.array(coef), intercept=intercept)
     # regressioninc
     Xrinc = X if intercept == 0 else add_intercept(X)
-    weights = np.random.uniform(0,1, size=y.shape)
+    weights = np.random.uniform(0, 1, size=y.shape)
     model = WeightedLeastSquares()
     result = model.fit(Xrinc, y, np.array(weights))
     # solve with scikit learn
