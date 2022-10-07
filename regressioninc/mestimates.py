@@ -5,7 +5,7 @@ implementation API is designed to match that of scikit-learn.
 from loguru import logger
 import numpy as np
 
-from base import LinearRegressor
+from regressioninc.base import LinearRegressor
 
 
 class MM_estimate(LinearRegressor):
