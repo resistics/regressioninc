@@ -9,20 +9,21 @@ from loguru import logger
 import numpy as np
 import numpy.linalg as linalg
 
-from base import LinearRegressor
+from regressioninc.base import LinearRegressor
 
 
 class LeastSquares(LinearRegressor):
-    """
-    Standard linear regression
-    """
+    """Standard linear regression"""
 
     def fit(self, X: np.ndarray, y: np.ndarray):
-        self.coef, resids2, rank, s = linalg.lstsq(X, y)
+        self.coef, resids2, rank, s = linalg.lstsq(X, y, rcond=None)
+        return self.coef
         
 
     def predict(self, X: np.ndarray):
-        return 
+        if self.coef is None:
+            raise ValueError("Model has not been fitted")
+        return np.matmul(X, self.coef)
 
 
 class WeightedLeastSquares(LinearRegressor):
