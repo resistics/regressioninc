@@ -1,5 +1,8 @@
 """
 Base class for regression in C
+
+The base class implements some basic functions and the abstract classes for
+regressors.
 """
 import numpy as np
 
