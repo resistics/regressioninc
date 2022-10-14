@@ -1,8 +1,6 @@
 from typing import List
 import pytest
 import numpy as np
-from regressioninc.testing import linear_real, linear_real_with_noise
-from regressioninc.testing import linear_complex
 
 np.random.seed(42)
 
@@ -18,10 +16,11 @@ np.random.seed(42)
 )
 def test_LeastSquares_real(coef: List[float], intercept: float, expected: List[float]):
     """Test ordinary least squares with real data"""
+    from regressioninc.testing.real import generate_linear
     from regressioninc.base import add_intercept
     from regressioninc.ols import LeastSquares
 
-    X, y = linear_real(np.array(coef), intercept=intercept)
+    X, y = generate_linear(np.array(coef), intercept=intercept)
     if intercept != 0:
         X = add_intercept(X)
     model = LeastSquares()
@@ -52,10 +51,11 @@ def test_LeastSquares_complex(
     coef: List[complex], intercept: complex, expected: List[complex]
 ):
     """Test ordinary least squares with complex data"""
+    from regressioninc.testing.complex import generate_linear
     from regressioninc.base import add_intercept
     from regressioninc.ols import LeastSquares
 
-    X, y = linear_complex(np.array(coef), intercept=intercept)
+    X, y = generate_linear(np.array(coef), intercept=intercept)
     if intercept != 0:
         X = add_intercept(X)
     model = LeastSquares()
@@ -75,13 +75,14 @@ def test_LeastSquares_complex(
 )
 def test_WeightedLeastSquares_real(coef: List[float], intercept: float):
     """Test weighted least squares using scikit-learn as a comparison"""
+    from regressioninc.testing.real import generate_linear
     from regressioninc.base import add_intercept
     from regressioninc.ols import WeightedLeastSquares
     from sklearn.linear_model import LinearRegression
 
     np.random.seed(42)
 
-    X, y = linear_real(np.array(coef), intercept=intercept)
+    X, y = generate_linear(np.array(coef), intercept=intercept)
     # regressioninc
     Xrinc = X if intercept == 0 else add_intercept(X)
     weights = np.random.uniform(0, 1, size=y.shape)
@@ -114,13 +115,15 @@ def test_WeightedLeastSquares_real_with_noise(
     coef: List[float], intercept: float, scale: float
 ):
     """Test weighted least squares using scikit-learn as a comparison"""
+    from regressioninc.testing.real import generate_linear, add_gaussian_noise
     from regressioninc.base import add_intercept
     from regressioninc.ols import WeightedLeastSquares
     from sklearn.linear_model import LinearRegression
 
     np.random.seed(42)
 
-    X, y = linear_real_with_noise(np.array(coef), intercept=intercept, scale=scale)
+    X, y = generate_linear(np.array(coef), intercept=intercept)
+    y = add_gaussian_noise(y, scale=scale)
     # regressioninc
     Xrinc = X if intercept == 0 else add_intercept(X)
     weights = np.random.uniform(0, 1, size=y.shape)
@@ -159,12 +162,13 @@ def test_WeightedLeastSquares_complex(
     coef: List[complex], intercept: complex, expected: List[complex]
 ):
     """Test weighted least squares for complex data without any noise"""
+    from regressioninc.testing.complex import generate_linear
     from regressioninc.base import add_intercept
     from regressioninc.ols import WeightedLeastSquares
 
     np.random.seed(42)
 
-    X, y = linear_complex(np.array(coef), intercept=intercept)
+    X, y = generate_linear(np.array(coef), intercept=intercept)
     if intercept != 0:
         X = add_intercept(X)
     weights = np.random.uniform(0, 1, size=y.shape)
