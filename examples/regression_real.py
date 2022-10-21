@@ -4,6 +4,7 @@ from regressioninc.testing.real import generate_linear, plot_2d
 from regressioninc.testing.real import add_gaussian_noise, add_outliers_to_observations
 from regressioninc.base import add_intercept
 from regressioninc.ols import LeastSquares
+from regressioninc.mestimates import M_estimate
 
 np.random.seed(42)
 
@@ -24,12 +25,14 @@ y = add_gaussian_noise(y)
 y = add_outliers_to_observations(y, outlier_percent=20)
 X_wint = add_intercept(X)
 ols_coef = LeastSquares().fit(X_wint, y)
+m_coef = M_estimate().fit(X_wint, y)
 fig = plot_2d(
     X,
     y,
     coefs={
         "actual": (coef, intercept),
         "least_squares": (ols_coef[:-1], ols_coef[-1]),
+        "m_estimate": (m_coef[:-1], m_coef[-1]),
     },
 )
 plt.show()
