@@ -1,6 +1,7 @@
 """
 Functions for generating and visualising complex-valued testing data
 """
+from loguru import logger
 from typing import Optional
 from pydantic import BaseModel
 import numpy as np
@@ -59,9 +60,9 @@ class ComplexGrid(BaseModel):
         >>> from regressioninc.testing.complex import ComplexGrid
         >>> grid = ComplexGrid(r1=-1, r2=1, nr=3, i1=-1, i2=1, ni=3)
         >>> grid.grid()
-        [[-1.-1.j -1.+0.j -1.+1.j]
-         [ 0.-1.j  0.+0.j  0.+1.j]
-         [ 1.-1.j  1.+0.j  1.+1.j]]
+        array([[-1.-1.j, -1.+0.j, -1.+1.j],
+               [ 0.-1.j,  0.+0.j,  0.+1.j],
+               [ 1.-1.j,  1.+0.j,  1.+1.j]])
         """
         r_pts = np.linspace(self.r1, self.r2, num=self.nr)
         i_pts = np.linspace(self.i1, self.i2, num=self.ni)
@@ -82,7 +83,9 @@ class ComplexGrid(BaseModel):
         >>> from regressioninc.testing.complex import ComplexGrid
         >>> grid = ComplexGrid(r1=-1, r2=1, nr=3, i1=-1, i2=1, ni=3)
         >>> grid.grid()
-        [-1.-1.j -1.+0.j -1.+1.j  0.-1.j  0.+0.j  0.+1.j  1.-1.j  1.+0.j  1.+1.j]
+        array([[-1.-1.j, -1.+0.j, -1.+1.j],
+               [ 0.-1.j,  0.+0.j,  0.+1.j],
+               [ 1.-1.j,  1.+0.j,  1.+1.j]])
         """
         return self.grid().flatten()
 
@@ -131,9 +134,7 @@ def generate_linear_grid(
     return X, y
 
 
-def generate_linear_random(
-    coef: np.ndarray, intercept: complex = 0, n_samples: Optional[int] = 0
-):
+def generate_linear_random(coef: np.ndarray, n_samples: int, intercept: complex = 0):
     """Produce complex data for testing without any noise"""
     n_features = coef.size
     if n_samples is None:
@@ -158,6 +159,44 @@ def add_gaussian_noise(
     scale = 0.5 * np.array([[scale[0], 0], [0, scale[1]]])
     z = np.random.multivariate_normal(loc, scale, size=n_samples).view(complex)
     return data + np.squeeze(z)
+
+
+def add_outliers_to_observations(
+    y: np.ndarray,
+    outlier_percent: float = 5,
+    mult_min=3,
+    mult_max=5,
+    random_signs_real: bool = False,
+    random_signs_imag: bool = False,
+) -> np.ndarray:
+    """Add outliers to a complex-valued 1-D observations array"""
+    if mult_min >= mult_max:
+        raise ValueError(f"{mult_min=} must be less than {mult_max=}")
+
+    if outlier_percent == 0:
+        logger.debug("No outliers being added, function call is redundant")
+        return y
+
+    n_samples = y.size
+    n_outliers = int((outlier_percent / 100) * n_samples)
+    # create outliers
+    max_r = np.max(np.abs(y.real))
+    max_i = np.max(np.abs(y.imag))
+    outliers_r = np.random.uniform(max_r * mult_min, max_r * mult_max, size=n_outliers)
+    outliers_i = np.random.uniform(max_i * mult_min, max_i * mult_max, size=n_outliers)
+    if random_signs_real:
+        signs = np.random.randint(0, 2, size=n_outliers) * 2 - 1
+        outliers_r = outliers_r * signs
+    if random_signs_imag:
+        signs = np.random.randint(0, 2, size=n_outliers) * 2 - 1
+        outliers_i = outliers_i * signs
+    outliers = outliers_r + 1j * outliers_i
+    # add to observations
+    logger.debug(f"Adding {n_outliers=} to observations")
+    outlier_indices = np.random.randint(0, n_samples, size=n_outliers)
+    y_new = np.array(y)
+    y_new[outlier_indices] = y_new[outlier_indices] + outliers
+    return y_new
 
 
 def plot_observations(y: np.ndarray, size: int = 10, alpha: float = 1.0) -> None:
@@ -190,7 +229,6 @@ def plot_observations_original(
         label="Observations original",
     )
     plt.title("Observations original")
-    plt.legend()
 
 
 def plot_regressor(
@@ -242,6 +280,7 @@ def plot_complex(
         plt.sca(axs[0, 1])
         plot_observations(y, size=size_obs, alpha=0.1)
         plot_observations_original(y_orig, size=size_obs)
+        plt.legend()
 
     # plot the regressors
     colors = matplotlib.cm.get_cmap("Pastel1", n_regressors).colors
@@ -252,7 +291,7 @@ def plot_complex(
 
     # plot the model predictions
     model_names = list(models.keys())
-    colors = matplotlib.cm.get_cmap("Set2", n_models).colors
+    colors = matplotlib.cm.get_cmap("Dark2", n_models).colors
     for imodel in range(n_models):
         plt.sca(axs[2, imodel])
         name = model_names[imodel]

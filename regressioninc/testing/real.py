@@ -9,6 +9,19 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
+def generate_linear(coef: np.ndarray, n_samples: int, intercept: float = 0):
+    """Generate real-valued linear testing data"""
+    n_features = coef.size
+    if n_samples < n_features:
+        raise ValueError(f"{n_samples=} must be >= {n_features=}")
+
+    # generate the data
+    shape = (n_samples, n_features)
+    X = np.random.uniform(-20, 20, size=shape)
+    y = np.matmul(X, coef) + intercept
+    return X, y
+
+
 def add_gaussian_noise(
     data: np.ndarray, loc: float = 0, scale: float = 3
 ) -> np.ndarray:
@@ -30,7 +43,7 @@ def add_gaussian_noise(
     np.ndarray
         Data with noise added
     """
-    data = data + np.random.normal(loc=0, scale=scale, size=data.shape)
+    data = data + np.random.normal(loc=loc, scale=scale, size=data.shape)
     return data
 
 
@@ -58,23 +71,6 @@ def add_outliers_to_observations(
     return y
 
 
-def generate_linear(
-    coef: np.ndarray, intercept: float = 0, n_samples: Optional[int] = None
-):
-    """Generate real-valued linear testing data"""
-    n_features = coef.size
-    if n_samples is None:
-        n_samples = coef.size * 2
-    if n_samples < n_features:
-        raise ValueError(f"{n_samples=} must be >= {n_features=}")
-
-    # generate the data
-    shape = (n_samples, n_features)
-    X = np.random.uniform(-20, 20, size=shape)
-    y = np.matmul(X, coef) + intercept
-    return X, y
-
-
 def linear_real_with_leverage():
     pass
 
@@ -88,12 +84,10 @@ def plot_1d(
     y: np.ndarray,
     coefs: Optional[Dict[str, Tuple[np.ndarray, float]]] = None,
 ) -> matplotlib.figure.Figure:
-    X = np.squeeze(X)
-    y = np.squeeze(y)
-    if X.ndim != 1:
-        raise ValueError(f"{X.ndim=} != 1")
-    if y.ndim != 1:
-        raise ValueError(f"{y.ndim=} != 1")
+    if (Xdim := np.squeeze(X).ndim) != 1:
+        raise ValueError(f"{Xdim=} != 1")
+    if (ydim := np.squeeze(y).ndim) != 1:
+        raise ValueError(f"{ydim=} != 1")
 
     fig = plt.figure()
     plt.scatter(X, y, label="Observations")
@@ -125,12 +119,10 @@ def plot_2d(
     y: np.ndarray,
     coefs: Optional[Dict[str, Tuple[np.ndarray, float]]] = None,
 ) -> matplotlib.figure.Figure:
-    X = np.squeeze(X)
-    y = np.squeeze(y)
-    if X.ndim != 2:
-        raise ValueError(f"{X.ndim=} != 2")
-    if y.ndim != 1:
-        raise ValueError(f"{y.ndim=} != 1")
+    if (Xdim := np.squeeze(X).ndim) != 2:
+        raise ValueError(f"{Xdim=} != 2")
+    if (ydim := np.squeeze(y).ndim) != 1:
+        raise ValueError(f"{ydim=} != 1")
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection="3d")
