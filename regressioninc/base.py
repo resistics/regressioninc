@@ -53,5 +53,3 @@ class Regressor(BaseModel):
 
     class Config:
         arbitrary_types_allowed: bool = True
-
-    pass
