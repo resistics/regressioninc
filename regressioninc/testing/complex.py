@@ -271,13 +271,15 @@ def plot_complex(
     n_models = len(models)
     n_rows = 2 if n_models == 0 else 3
     n_cols = max([n_observations, n_regressors, n_models])
+    logger.info(f"{n_rows=}")
+    logger.info(f"{n_cols=}")
 
-    fig, axs = plt.subplots(n_rows, n_cols)
+    fig = plt.figure()
     # plot the observations
-    plt.sca(axs[0, 0])
+    plt.subplot(n_rows, n_cols, 1)
     plot_observations(y, size=size_obs)
     if y_orig is not None:
-        plt.sca(axs[0, 1])
+        plt.subplot(n_rows, n_cols, 2)
         plot_observations(y, size=size_obs, alpha=0.1)
         plot_observations_original(y_orig, size=size_obs)
         plt.legend()
@@ -285,7 +287,7 @@ def plot_complex(
     # plot the regressors
     colors = matplotlib.cm.get_cmap("Pastel1", n_regressors).colors
     for ireg, color in enumerate(colors):
-        plt.sca(axs[1, ireg])
+        plt.subplot(n_rows, n_cols, n_cols + 1 + ireg)
         plot_regressor(X[:, ireg], color=color, size=size_reg)
         plt.title(f"Regressor {ireg + 1} of {n_regressors}")
 
@@ -293,7 +295,7 @@ def plot_complex(
     model_names = list(models.keys())
     colors = matplotlib.cm.get_cmap("Dark2", n_models).colors
     for imodel in range(n_models):
-        plt.sca(axs[2, imodel])
+        plt.subplot(n_rows, n_cols, 2 * n_cols + 1 + imodel)
         name = model_names[imodel]
         color = colors[imodel]
         model = models[name]
