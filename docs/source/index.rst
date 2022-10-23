@@ -6,11 +6,40 @@
 Welcome to regressioninc's documentation!
 =========================================
 
+Regression in C is a package focussing on regression for complex-valued
+problems. There are already multiple packages for regression in Python, however
+these offer varying amounts of support for the complex-valued variables. Numpy's
+least squares implementation has partial support for complex-valued variables
+and other packages support multi-target regression, which can be used for
+complex-valued problems, but again support is spotty.
+
+This package is currently being developed. The plan for current and future
+development includes:
+
+- Least squares and weighted least squares implementation
+- Visualisation of complex-valued linear problems
+- Robust linear regression for complex-valued variables
+- Uncertainty estimation
+
+Next steps
+----------
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: User Guide:
 
    gallery/index.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference:
+
+   regressioninc.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Literature:
+
    references.rst
 
 

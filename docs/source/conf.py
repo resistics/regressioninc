@@ -10,7 +10,7 @@ import re
 import regressioninc
 from sphinx_gallery.sorting import FileNameSortKey
 
-project = "regressioninc"
+project = "Regression in C"
 copyright = "2022, Neeraj Shah"
 author = "Neeraj Shah"
 
