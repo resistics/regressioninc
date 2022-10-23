@@ -87,7 +87,7 @@ class ComplexGrid(BaseModel):
                [ 0.-1.j,  0.+0.j,  0.+1.j],
                [ 1.-1.j,  1.+0.j,  1.+1.j]])
         """
-        return self.grid().flatten()
+        return self.grid().flatten().reshape(self.n_pts, 1)
 
 
 def generate_linear_grid(
