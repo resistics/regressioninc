@@ -134,17 +134,20 @@ def generate_linear_grid(
     return X, y
 
 
-def generate_linear_random(coef: np.ndarray, n_samples: int, intercept: complex = 0):
+def generate_linear_random(
+    coef: np.ndarray, n_samples: int, intercept: complex = 0, min_rand=-10, max_rand=10
+):
     """Produce complex data for testing without any noise"""
-    n_features = coef.size
+    n_regressors = coef.size
     if n_samples is None:
         n_samples = coef.size * 2
-    if n_samples < n_features:
-        raise ValueError(f"{n_samples=} must be >= {n_features=}")
-    shape = (n_samples, n_features)
+    if n_samples < n_regressors:
+        raise ValueError(f"{n_samples=} must be >= {n_regressors=}")
+    shape = (n_samples, n_regressors)
     # generate the data
-    X = np.random.uniform(-20, 20, size=shape)
+    X = np.random.uniform(min_rand, max_rand, size=shape)
     X = X.astype(complex) + 1.0j * np.random.uniform(-20, 20, size=shape)
+    X = X.reshape(n_samples, n_regressors)
     y = np.matmul(X, coef) + intercept
     return X, y
 

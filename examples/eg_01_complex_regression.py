@@ -1,6 +1,6 @@
 r"""
-Complex-valued regression
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Real to Complex regression
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This example begins with linear regression in the real domain and then builds up
 to show how linear problems can be thought of in the complex domain.
