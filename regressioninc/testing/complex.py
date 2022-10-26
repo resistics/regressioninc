@@ -212,7 +212,7 @@ def plot_observations(y: np.ndarray, size: int = 10, alpha: float = 1.0) -> None
         edgecolor="firebrick",
         marker="d",
         alpha=alpha,
-        label="Observations",
+        label="y",
     )
     plt.title("Observations")
 
@@ -229,7 +229,7 @@ def plot_observations_original(
         edgecolor="darkslategrey",
         marker="*",
         alpha=alpha,
-        label="Observations original",
+        label="y original",
     )
     plt.title("Observations original")
 
