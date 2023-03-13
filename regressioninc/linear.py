@@ -119,6 +119,7 @@ def glr_coef_to_complex(coef: np.ndarray) -> np.ndarray:
     Generate the linear problem and add an intercept column to the regressors
 
     >>> import numpy as np
+    >>> np.set_printoptions(precision=3, suppress=True)
     >>> from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
     >>> from regressioninc.linear import add_intercept, LeastSquares
     >>> from regressioninc.linear import complex_to_glr, glr_coef_to_complex
@@ -140,12 +141,12 @@ def glr_coef_to_complex(coef: np.ndarray) -> np.ndarray:
     Look at the real-valued coefficients
 
     >>> model.coef
-    array([3.00000000e+00, 2.00000000e+00, 1.00000000e+01, 1.77635684e-15])
+    array([ 3.,  2., 10.,  0.])
 
     Convert the coefficients back to the complex domain
 
     >>> glr_coef_to_complex(model.coef)
-    array([ 3.+2.00000000e+00j, 10.+1.77635684e-15j])
+    array([ 3.+2.j, 10.+0.j])
     """
     return coef[0::2] + 1j * coef[1::2]
 
