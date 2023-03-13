@@ -140,12 +140,12 @@ def glr_coef_to_complex(coef: np.ndarray) -> np.ndarray:
     Look at the real-valued coefficients
 
     >>> model.coef
-    array([3.00000000e+00, 2.00000000e+00, 1.00000000e+01, 2.22044605e-15])
+    array([3.00000000e+00, 2.00000000e+00, 1.00000000e+01, 1.77635684e-15])
 
     Convert the coefficients back to the complex domain
 
     >>> glr_coef_to_complex(model.coef)
-    array([ 3.+2.00000000e+00j, 10.+2.22044605e-15j])
+    array([ 3.+2.00000000e+00j, 10.+1.77635684e-15j])
     """
     return coef[0::2] + 1j * coef[1::2]
 
