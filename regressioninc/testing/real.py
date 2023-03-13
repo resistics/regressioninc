@@ -47,7 +47,7 @@ def add_gaussian_noise(
     return data
 
 
-def add_outliers_to_observations(
+def add_outliers(
     y: np.ndarray,
     outlier_percent: float = 5,
     outlier_mult=3,

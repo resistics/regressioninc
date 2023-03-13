@@ -164,7 +164,7 @@ def add_gaussian_noise(
     return data + np.squeeze(z)
 
 
-def add_outliers_to_observations(
+def add_outliers(
     y: np.ndarray,
     outlier_percent: float = 5,
     mult_min=3,
