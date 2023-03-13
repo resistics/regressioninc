@@ -53,4 +53,5 @@ jobs:
         uses: codecov/codecov-action@v3
         if: ${{ matrix.platform == 'ubuntu-latest' && matrix.python-version == 3.9 }}
         with:
+          token: ${{secrets.CODECOV_TOKEN}}
           fail_ci_if_error: true
