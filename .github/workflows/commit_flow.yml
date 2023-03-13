@@ -51,6 +51,6 @@ jobs:
           poetry run coverage xml
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-        if: ${{ github.ref == 'refs/heads/master' && matrix.platform == 'ubuntu-latest' && matrix.python-version == 3.9 }}
+        if: ${{ matrix.platform == 'ubuntu-latest' && matrix.python-version == 3.9 }}
         with:
           fail_ci_if_error: true
