@@ -13,8 +13,6 @@ from sphinx_gallery.sorting import FileNameSortKey
 project = "Regression in C"
 copyright = "2022, Neeraj Shah"
 author = "Neeraj Shah"
-
-# The full version, including alpha/beta/rc tags
 release = regressioninc.__version__
 
 # -- General configuration ---------------------------------------------------
