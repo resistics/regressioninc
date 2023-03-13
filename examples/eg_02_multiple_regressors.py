@@ -1,6 +1,6 @@
 r"""
-Multiple regressors in C
-^^^^^^^^^^^^^^^^^^^^^^^^
+Multiple regressors
+^^^^^^^^^^^^^^^^^^^
 
 The previous example showed complex-valued regression with a single regressor.
 In practice, it is common to have multiple regressors. The following example
@@ -50,7 +50,7 @@ plt.show()
 
 # %%
 # Let's add in a second regressor but rather than having a grid of input points
-# use some random input points
+# use some random input points.
 coef_random = np.array([2.7 - 1.8j])
 X_random, _ = generate_linear_random(coef_random, y.size)
 coef = np.concatenate((coef, coef_random))

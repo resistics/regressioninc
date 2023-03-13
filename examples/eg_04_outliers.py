@@ -1,22 +1,25 @@
 r"""
-Outliers in C
-^^^^^^^^^^^^^
+Outliers
+^^^^^^^^
 
-Outliers are another type of noise in measurements. There are many causes of
-outliers such as malfunctioning instrumentation or unknown regressors. The
-existence of outliers can have a significant effect on estimates of
-coefficients.
+Outliers in data can occur for a variety of reasons. Depending on the ways in
+which they appear, they can be worth investigating in more detail. However, the
+presence of outliers can skew estimation of the coefficients of interest.
+
+More information about outliers:
+
+- https://en.wikipedia.org/wiki/Outlier
 """
 import numpy as np
 import matplotlib.pyplot as plt
 from regressioninc.linear import add_intercept, LeastSquares
 from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
-from regressioninc.testing.complex import add_outliers_to_observations, plot_complex
+from regressioninc.testing.complex import add_outliers, plot_complex
 
 np.random.seed(42)
 
 # %%
-# Let's setup another linear regression problem with complex values
+# Let's setup another linear regression problem with complex values.
 coef = np.array([0.5 + 2j, -3 - 1j])
 grid_r1 = ComplexGrid(r1=0, r2=10, nr=11, i1=-5, i2=5, ni=11)
 grid_r2 = ComplexGrid(r1=-25, r2=-5, nr=11, i1=-5, i2=5, ni=11)
@@ -41,8 +44,8 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# Add some noise to the observations and let's see what they look like now
-y_noise = add_outliers_to_observations(y, outlier_percent=20, mult_min=5, mult_max=7)
+# Add some outliers to the observations.
+y_noise = add_outliers(y, outlier_percent=20, mult_min=5, mult_max=7)
 
 fig = plot_complex(X, y_noise, {}, y_orig=y)
 fig.set_size_inches(7, 6)

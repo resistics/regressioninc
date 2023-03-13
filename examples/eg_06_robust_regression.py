@@ -1,53 +1,14 @@
 r"""
-Complex to real
-^^^^^^^^^^^^^^^
+Robust regression
+^^^^^^^^^^^^^^^^^
 
-Complex-valued linear problems can be reformulated as real-valued problems by
-splitting out the real and imaginary parts of the equations.
-
-.. math::
-
-    a + ib = C_1 (x + iy) .
-
-Remember that we are solving for :math:`C_1 = (c_{1r} + c_{1i})`, which is also
-complex-valued, therefore,
-
-.. math::
-
-    a + ib = (c_{1r} + c_{1i}) (x + iy) .
-
-This can be expanded out
-
-.. math::
-
-    a + ib &= (c_{1r} + ic_{1i}) (x + iy) \\
-           &= c_{1r} x - c_{1i} y + i c_{1r} y + i c_{1i} x \\
-           &= (c_{1r} x - c_{1i} y) + i (c_{1r} y + i c_{1i} x) ,
-
-which gives,
-
-.. math::
-
-    a &= c_{1r} x - c_{1i} y \\
-    b &= c_{1r} y + i c_{1i} x .
-
-For the complex-valued problem, the aim is to solve for :math:`C_1`. Making this
-real-valued means we are solving for :math:`c_{1r}` and :math:`c_{1i}`.
-
-Moving from complex-valued to real-valued results in the following
-
-- Doubling the number of observations as the real and imaginary parts of the
-  observations are split up
-- Doubling the number of regressors as we are now solving for the real and
-  imaginary component of each regressor explicitly
+Robust regression
 """
 import numpy as np
 import matplotlib.pyplot as plt
 from regressioninc.linear import add_intercept, LeastSquares, M_estimate
 from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
-from regressioninc.testing.complex import add_gaussian_noise
-from regressioninc.testing.complex import add_outliers, plot_complex
-from regressioninc.linear import complex_to_glr, glr_coef_to_complex
+from regressioninc.testing.complex import add_gaussian_noise, add_outliers, plot_complex
 
 np.random.seed(42)
 
@@ -123,22 +84,3 @@ fig = plot_complex(
 fig.set_size_inches(7, 9)
 plt.tight_layout()
 plt.show()
-
-
-# %%
-# Try running as a real-valued problem
-X_real, y_real = complex_to_glr(X, y_noise)
-model_ls = LeastSquares()
-model_ls.fit(X_real, y_real)
-coef = glr_coef_to_complex(model_ls.coef)
-for idx, coef in enumerate(coef):
-    print(f"Coefficient {idx}: {coef:.6f}")
-
-
-# %%
-# Try running using real-valued M_estimates
-model_mest = M_estimate()
-model_mest.fit(X_real, y_real)
-coef = glr_coef_to_complex(model_mest.coef)
-for idx, coef in enumerate(coef):
-    print(f"Coefficient {idx}: {coef:.6f}")

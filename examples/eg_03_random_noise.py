@@ -1,21 +1,18 @@
 r"""
-Random Noise in C
-^^^^^^^^^^^^^^^^^
+Random noise
+^^^^^^^^^^^^
 
 Unlike the prior examples, most real world data have noise. Noise can occur in
-both the observations and the depending on how data is acquired.
+both the observations and the regressors depending on how data is acquired.
 
 Typical types of noise include:
 
 - Random measurement error, which can occur on both the observations and the
   regressors (for instance if both come from measurements)
-- Outliers that can skew results
+- Gross outliers which can occur for many reasons
 
-Unexpected observations due to unknown regressors. These observations are
-sometimes treated as noise when they are really a limitation of the modelling.
-
-In this example, we'll explore adding noise to the data and seeing the impact
-this has on the estimated coefficients.
+In this example, we'll explore adding gaussian distributed random noise to the
+data and seeing the impact this has on the estimated coefficients.
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,7 +23,7 @@ from regressioninc.testing.complex import add_gaussian_noise, plot_complex
 np.random.seed(42)
 
 # %%
-# Let's setup another linear regression problem with complex values
+# Let's setup another linear regression problem with complex values.
 coef = np.array([0.5 + 2j, -3 - 1j])
 grid_r1 = ComplexGrid(r1=0, r2=10, nr=11, i1=-5, i2=5, ni=11)
 grid_r2 = ComplexGrid(r1=-25, r2=-5, nr=11, i1=-5, i2=5, ni=11)
@@ -51,7 +48,8 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# Add some noise to the observations and let's see what they look like now
+# Add some gaussian distributed random noise to the observations and let's see
+# what they look like now.
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(3, 3))
 
 fig = plot_complex(X, y_noise, {}, y_orig=y)
@@ -61,7 +59,7 @@ plt.show()
 
 # %%
 # Now let's try and estimate the coefficients again but with the noisy
-# observations. In this case, the coefficients estimates are slightly off the
+# observations. In this case, the coefficient estimates are slightly off the
 # actual value due to the existence of the noise. Note that least squares is the
 # maximum likelihood estimator for gaussian random noise. However, with other
 # types of noise, there may be more effective regression methods.
