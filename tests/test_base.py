@@ -18,6 +18,6 @@ def test_sum_square_residuals():
     X, y = generate_linear(coef, intercept=10, n_samples=20)
     y = add_gaussian_noise(y)
     X = add_intercept(X)
-    np_coef, np_residuals, np_rank, np_singular = linalg.lstsq(X, y)
+    np_coef, np_residuals, np_rank, np_singular = linalg.lstsq(X, y, rcond=None)
     residuals = sum_square_residuals(X, y, np_coef)
     np.testing.assert_almost_equal(np_residuals, residuals, 12)
