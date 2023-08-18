@@ -42,6 +42,9 @@ templates_path = ["_templates"]
 exclude_patterns = ["setup.rst", "modules.rst"]
 
 # regressionnc configuration
+# code styles
+pygments_style = "gruvbox-light"
+pygments_dark_style = "gruvbox-dark"
 # autodoc
 autosectionlabel_prefix_document = True
 autodoc_member_order = "bysource"
@@ -80,13 +83,17 @@ sphinx_gallery_conf = {
     "examples_dirs": ["../../examples"],
     "gallery_dirs": ["gallery"],
     "thumbnail_size": (300, 300),
+    "examples_dirs": [
+        "../../examples/complex_regression",
+        "../../examples/linear_models",
+    ],
+    "gallery_dirs": [
+        "examples_complex_regression",
+        "examples_linear_models",
+    ],
     "image_scrapers": image_scrapers,
     "within_subsection_order": FileNameSortKey,
 }
-
-# code styles
-pygments_style = "sphinx"
-pygments_dark_style = "monokai"
 
 
 # -- Options for HTML output -------------------------------------------------

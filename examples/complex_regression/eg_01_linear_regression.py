@@ -13,7 +13,7 @@ Useful references:
 # sphinx_gallery_thumbnail_number = 5
 import numpy as np
 import matplotlib.pyplot as plt
-from regressioninc.linear import add_intercept, LeastSquares
+from regressioninc.linear.models import add_intercept, OLS
 from regressioninc.testing.complex import ComplexGrid
 
 # %%
@@ -43,9 +43,9 @@ fig.show()
 # minimising the squared misfit between the observations and estimated
 # observations calculated using the estimated coefficients.
 X = add_intercept(X)
-model = LeastSquares()
+model = OLS()
 model.fit(X, y)
-print(model.coef)
+print(model.coef_)
 
 # %%
 # Least squares was able to correctly calculate the slope and intercept for the
@@ -168,6 +168,6 @@ plt.show()
 # Regression in C does not automatically solve for the intercept and if desired,
 # an intercept column needs to be added to the regressors.
 X = add_intercept(X)
-model = LeastSquares()
+model = OLS()
 model.fit(X, y)
-print(model.coef)
+print(model.coef_)

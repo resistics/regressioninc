@@ -14,6 +14,8 @@ scipy = ">=1.9.1"
 scikit-learn = ">=1.1.2"
 matplotlib = ">=3.6.1"
 statsmodels = ">=0.13.2"
+pandas = "^2.0.1"
+geom-median = "^0.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -40,6 +42,10 @@ sphinx-copybutton = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-html = "*"
+
+
+[tool.poetry.group.notebooks.dependencies]
+ipykernel = "^6.23.1"
 
 [build-system]
 requires = ["poetry-core"]

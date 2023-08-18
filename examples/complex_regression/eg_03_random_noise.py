@@ -16,7 +16,7 @@ data and seeing the impact this has on the estimated coefficients.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from regressioninc.linear import add_intercept, LeastSquares
+from regressioninc.linear.models import add_intercept, OLS
 from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
 from regressioninc.testing.complex import add_gaussian_noise, plot_complex
 
@@ -37,9 +37,9 @@ plt.show()
 # %%
 # Estimating the coefficients using least squares gives the expected values.
 X = add_intercept(X)
-model = LeastSquares()
+model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef):
+for idx, coef in enumerate(model.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 fig = plot_complex(X, y, {"least squares": model})
@@ -63,9 +63,9 @@ plt.show()
 # actual value due to the existence of the noise. Note that least squares is the
 # maximum likelihood estimator for gaussian random noise. However, with other
 # types of noise, there may be more effective regression methods.
-model = LeastSquares()
+model = OLS()
 model.fit(X, y_noise)
-for idx, coef in enumerate(model.coef):
+for idx, coef in enumerate(model.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 fig = plot_complex(X, y_noise, {"least squares": model}, y_orig=y)

@@ -6,7 +6,7 @@ Robust regression
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from regressioninc.linear import add_intercept, LeastSquares, M_estimate
+from regressioninc.linear.models import add_intercept, OLS, M_estimate
 from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
 from regressioninc.testing.complex import add_gaussian_noise, add_outliers, plot_complex
 
@@ -52,17 +52,17 @@ plt.show()
 # %%
 # Solve
 X = add_intercept(X)
-model = LeastSquares()
+model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef):
+for idx, coef in enumerate(model.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 # %%
 # Add some outliers
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(21, 21))
-model_ls = LeastSquares()
+model_ls = OLS()
 model_ls.fit(X, y_noise)
-for idx, coef in enumerate(model_ls.coef):
+for idx, coef in enumerate(model_ls.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 fig = plot_complex(X, y_noise, {"least squares": model_ls}, y_orig=y)
@@ -75,7 +75,7 @@ plt.show()
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(21, 21))
 model_mest = M_estimate()
 model_mest.fit(X, y_noise)
-for idx, coef in enumerate(model_mest.coef):
+for idx, coef in enumerate(model_mest.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 fig = plot_complex(

@@ -156,3 +156,7 @@ cython_debug/
 
 # VSCode
 .vscode/
+
+# regressioninc specific
+artifacts/
+docs/source/examples_*

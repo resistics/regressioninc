@@ -40,14 +40,19 @@ Moving from complex-valued to real-valued results in the following
   observations are split up
 - Doubling the number of regressors as we are now solving for the real and
   imaginary component of each regressor explicitly
+
+Usually, it is better to solve the problem with complex-values as outlined in 
+this thread:
+
+https://stats.stackexchange.com/questions/66088/analysis-with-complex-data-anything-different
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from regressioninc.linear import add_intercept, LeastSquares, M_estimate
+from regressioninc.linear.models import add_intercept, OLS, M_estimate
 from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
 from regressioninc.testing.complex import add_gaussian_noise
 from regressioninc.testing.complex import add_outliers, plot_complex
-from regressioninc.linear import complex_to_glr, glr_coef_to_complex
+from regressioninc.linear.models import complex_to_real, real_coef_to_complex
 
 np.random.seed(42)
 
@@ -91,17 +96,17 @@ plt.show()
 # %%
 # Solve
 X = add_intercept(X)
-model = LeastSquares()
+model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef):
+for idx, coef in enumerate(model.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 # %%
 # Add some outliers
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(21, 21))
-model_ls = LeastSquares()
+model_ls = OLS()
 model_ls.fit(X, y_noise)
-for idx, coef in enumerate(model_ls.coef):
+for idx, coef in enumerate(model_ls.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 fig = plot_complex(X, y_noise, {"least squares": model_ls}, y_orig=y)
@@ -114,7 +119,7 @@ plt.show()
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(21, 21))
 model_mest = M_estimate()
 model_mest.fit(X, y_noise)
-for idx, coef in enumerate(model_mest.coef):
+for idx, coef in enumerate(model_mest.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 fig = plot_complex(
@@ -127,10 +132,10 @@ plt.show()
 
 # %%
 # Try running as a real-valued problem
-X_real, y_real = complex_to_glr(X, y_noise)
-model_ls = LeastSquares()
+X_real, y_real = complex_to_real(X, y_noise)
+model_ls = OLS()
 model_ls.fit(X_real, y_real)
-coef = glr_coef_to_complex(model_ls.coef)
+coef = real_coef_to_complex(model_ls.coef_)
 for idx, coef in enumerate(coef):
     print(f"Coefficient {idx}: {coef:.6f}")
 
@@ -139,6 +144,6 @@ for idx, coef in enumerate(coef):
 # Try running using real-valued M_estimates
 model_mest = M_estimate()
 model_mest.fit(X_real, y_real)
-coef = glr_coef_to_complex(model_mest.coef)
+coef = real_coef_to_complex(model_mest.coef_)
 for idx, coef in enumerate(coef):
     print(f"Coefficient {idx}: {coef:.6f}")

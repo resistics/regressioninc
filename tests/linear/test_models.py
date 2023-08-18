@@ -4,8 +4,7 @@ Test linear regressors
 from typing import List
 import pytest
 import numpy as np
-
-# import statsmodels.api as sm
+import statsmodels.api as sm
 
 
 np.random.seed(42)
@@ -20,20 +19,20 @@ np.random.seed(42)
         ([17.2, 23.6, -50.2], 32, -80.5, [17.2, 23.6, -50.2, -80.5]),
     ],
 )
-def test_LeastSquares_real(
+def test_OLS_real(
     coef: List[float], n_samples: int, intercept: float, expected: List[float]
 ):
     """Test ordinary least squares with real data"""
     from regressioninc.testing.real import generate_linear
-    from regressioninc.linear import add_intercept, LeastSquares
+    from regressioninc.linear.models import add_intercept, OLS
 
     X, y = generate_linear(np.array(coef), n_samples, intercept=intercept)
     if intercept != 0:
         X = add_intercept(X)
-    model = LeastSquares()
+    model = OLS()
     model.fit(X, y)
     predictions = model.predict(X)
-    np.testing.assert_almost_equal(expected, model.coef, decimal=8)
+    np.testing.assert_almost_equal(expected, model.coef_, decimal=8)
     np.testing.assert_almost_equal(y, predictions, decimal=8)
 
 
@@ -66,20 +65,20 @@ def test_LeastSquares_real(
         ),
     ],
 )
-def test_LeastSquares_complex(
+def test_OLS_complex(
     coef: List[complex], n_samples: int, intercept: complex, expected: List[complex]
 ):
     """Test ordinary least squares with complex data"""
     from regressioninc.testing.complex import generate_linear_random
-    from regressioninc.linear import add_intercept, LeastSquares
+    from regressioninc.linear.models import add_intercept, OLS
 
     X, y = generate_linear_random(np.array(coef), n_samples, intercept=intercept)
     if intercept != 0:
         X = add_intercept(X)
-    model = LeastSquares()
+    model = OLS()
     model.fit(X, y)
     predictions = model.predict(X)
-    np.testing.assert_almost_equal(expected, model.coef, decimal=8)
+    np.testing.assert_almost_equal(expected, model.coef_, decimal=8)
     np.testing.assert_almost_equal(y, predictions, decimal=8)
 
 
@@ -91,26 +90,27 @@ def test_LeastSquares_complex(
         ([17.2, 23.6, -50.2], 101, 10),
     ],
 )
-def test_WeightedLeastSquares_real(coef: List[float], n_samples: int, intercept: float):
+def test_WLS_real(coef: List[float], n_samples: int, intercept: float):
     """Test weighted least squares using scikit-learn as a comparison"""
     from regressioninc.testing.real import generate_linear
-    from regressioninc.linear import add_intercept, WeightedLeastSquares
+    from regressioninc.linear.models import add_intercept, WLS
     from sklearn.linear_model import LinearRegression
 
     X, y = generate_linear(np.array(coef), n_samples, intercept=intercept)
     # regressioninc
     Xrinc = X if intercept == 0 else add_intercept(X)
     weights = np.random.uniform(0, 1, size=y.shape)
-    model = WeightedLeastSquares()
-    result = model.fit(Xrinc, y, np.array(weights))
+    model = WLS()
+    model.fit(Xrinc, y, sample_weight=np.array(weights))
+    result = model.coef_
     # solve with scikit learn
     fit_intercept = intercept != 0
-    model = LinearRegression(fit_intercept=fit_intercept)
-    model.fit(X, y, sample_weight=weights)
-    compare = model.coef_
+    model_sk = LinearRegression(fit_intercept=fit_intercept)
+    model_sk.fit(X, y, sample_weight=weights)
+    compare = model_sk.coef_
     if fit_intercept:
         compare = compare.tolist()
-        compare.append(model.intercept_)
+        compare.append(model_sk.intercept_)
     # check they match
     np.testing.assert_almost_equal(compare, result)
 
@@ -126,12 +126,12 @@ def test_WeightedLeastSquares_real(coef: List[float], n_samples: int, intercept:
         ([17.2, 23.6, -50.2], 18, 10, 8),
     ],
 )
-def test_WeightedLeastSquares_real_with_noise(
+def test_WLS_real_with_noise(
     coef: List[float], n_samples: int, intercept: float, scale: float
 ):
     """Test weighted least squares using scikit-learn as a comparison"""
     from regressioninc.testing.real import generate_linear, add_gaussian_noise
-    from regressioninc.linear import add_intercept, WeightedLeastSquares
+    from regressioninc.linear.models import add_intercept, WLS
     from sklearn.linear_model import LinearRegression
 
     X, y = generate_linear(np.array(coef), n_samples, intercept=intercept)
@@ -139,16 +139,17 @@ def test_WeightedLeastSquares_real_with_noise(
     # regressioninc
     Xrinc = X if intercept == 0 else add_intercept(X)
     weights = np.random.uniform(0, 1, size=y.shape)
-    model = WeightedLeastSquares()
-    result = model.fit(Xrinc, y, np.array(weights))
+    model = WLS()
+    model.fit(Xrinc, y, sample_weight=np.array(weights))
+    result = model.coef_
     # solve with scikit learn
     fit_intercept = intercept != 0
-    model = LinearRegression(fit_intercept=fit_intercept)
-    model.fit(X, y, sample_weight=weights)
-    compare = model.coef_
+    model_sk = LinearRegression(fit_intercept=fit_intercept)
+    model_sk.fit(X, y, sample_weight=weights)
+    compare = model_sk.coef_
     if fit_intercept:
         compare = compare.tolist()
-        compare.append(model.intercept_)
+        compare.append(model_sk.intercept_)
     # check they match
     np.testing.assert_almost_equal(compare, result)
 
@@ -182,12 +183,12 @@ def test_WeightedLeastSquares_real_with_noise(
         ),
     ],
 )
-def test_WeightedLeastSquares_complex(
+def test_WLS_complex(
     coef: List[complex], n_samples: int, intercept: complex, expected: List[complex]
 ):
     """Test weighted least squares for complex data without any noise"""
     from regressioninc.testing.complex import generate_linear_random
-    from regressioninc.linear import add_intercept, WeightedLeastSquares
+    from regressioninc.linear.models import add_intercept, WLS
 
     np.random.seed(42)
 
@@ -195,30 +196,30 @@ def test_WeightedLeastSquares_complex(
     if intercept != 0:
         X = add_intercept(X)
     weights = np.random.uniform(0, 1, size=y.shape)
-    model = WeightedLeastSquares()
-    model.fit(X, y, weights=weights)
+    model = WLS()
+    model.fit(X, y, sample_weight=weights)
     predictions = model.predict(X)
-    np.testing.assert_almost_equal(expected, model.coef, decimal=8)
+    np.testing.assert_almost_equal(expected, model.coef_, decimal=8)
     np.testing.assert_almost_equal(y, predictions, decimal=8)
 
 
-# def test_M_estimate_real():
-#     """Test m estimates on real data vs. statsmodels"""
-#     from regressioninc.testing.real import generate_linear, add_gaussian_noise
-#     from regressioninc.testing.real import add_outliers
-#     from regressioninc.linear import add_intercept, M_estimate
+# # def test_M_estimate_real():
+# #     """Test m estimates on real data vs. statsmodels"""
+# #     from regressioninc.testing.real import generate_linear, add_gaussian_noise
+# #     from regressioninc.testing.real import add_outliers
+# #     from regressioninc.linear import add_intercept, M_estimate
 
-#     coef = np.array([5, 7])
-#     intercept = 10
-#     X, y = generate_linear(coef, intercept=intercept, n_samples=30)
-#     y = add_gaussian_noise(y)
-#     y = add_outliers(y, outlier_percent=20)
-#     X_wint = add_intercept(X)
-#     m_coef = M_estimate().fit(X_wint, y)
-#     print(m_coef)
-#     rlm_model = sm.RLM(y, X_wint, M=sm.robust.norms.TukeyBiweight())
-#     rlm_results = rlm_model.fit(conv="sresid")
-#     print(rlm_results.summary())
-#     print(rlm_results.params)
-#     assert False
-#     np.testing.assert_almost_equal(m_coef, rlm_results.params)
+# #     coef = np.array([5, 7])
+# #     intercept = 10
+# #     X, y = generate_linear(coef, intercept=intercept, n_samples=30)
+# #     y = add_gaussian_noise(y)
+# #     y = add_outliers(y, outlier_percent=20)
+# #     X_wint = add_intercept(X)
+# #     m_coef = M_estimate().fit(X_wint, y)
+# #     print(m_coef)
+# #     rlm_model = sm.RLM(y, X_wint, M=sm.robust.norms.TukeyBiweight())
+# #     rlm_results = rlm_model.fit(conv="sresid")
+# #     print(rlm_results.summary())
+# #     print(rlm_results.params)
+# #     assert False
+# #     np.testing.assert_almost_equal(m_coef, rlm_results.params)

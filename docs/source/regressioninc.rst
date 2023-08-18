@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   regressioninc.linear
    regressioninc.testing
 
 Submodules
@@ -16,7 +17,9 @@ Submodules
    :maxdepth: 4
 
    regressioninc.base
-   regressioninc.linear
+   regressioninc.math
+   regressioninc.transform
+   regressioninc.validation
 
 Module contents
 ---------------

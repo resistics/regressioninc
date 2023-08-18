@@ -12,7 +12,7 @@ More information about outliers:
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from regressioninc.linear import add_intercept, LeastSquares
+from regressioninc.linear.models import add_intercept, OLS
 from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
 from regressioninc.testing.complex import add_outliers, plot_complex
 
@@ -33,9 +33,9 @@ plt.show()
 # %%
 # Estimating the coefficients using least squares gives the expected values.
 X = add_intercept(X)
-model = LeastSquares()
+model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef):
+for idx, coef in enumerate(model.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 fig = plot_complex(X, y, {"least squares": model})
@@ -56,9 +56,9 @@ plt.show()
 # Now let's try and estimate the coefficients again but with the noisy
 # observations. In this case, the coefficients estimates are slightly off the
 # actual value due to the existence of the noise.
-model = LeastSquares()
+model = OLS()
 model.fit(X, y_noise)
-for idx, coef in enumerate(model.coef):
+for idx, coef in enumerate(model.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 fig = plot_complex(X, y_noise, {"least squares": model}, y_orig=y)

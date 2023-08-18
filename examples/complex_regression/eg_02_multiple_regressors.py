@@ -10,7 +10,7 @@ and visualise it.
 # sphinx_gallery_thumbnail_number = 5
 import numpy as np
 import matplotlib.pyplot as plt
-from regressioninc.linear import add_intercept, LeastSquares
+from regressioninc.linear.models import add_intercept, OLS
 from regressioninc.testing.complex import generate_linear_random, plot_complex
 from regressioninc.testing.complex import ComplexGrid
 
@@ -77,9 +77,9 @@ plt.show()
 # %%
 # Now the coefficients can be solved for using the observations y and the
 # regressors X.
-model = LeastSquares()
+model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef):
+for idx, coef in enumerate(model.coef_):
     print(f"Coefficient {idx}: {coef:.6f}")
 
 # %%

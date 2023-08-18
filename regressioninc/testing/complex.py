@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-from regressioninc.base import Regressor
+from regressioninc.base import ComplexRegressorMixin
 
 
 class ComplexGrid(BaseModel):
@@ -262,7 +262,7 @@ def plot_estimate(
 def plot_complex(
     X,
     y,
-    models: dict[str, Regressor],
+    models: dict[str, ComplexRegressorMixin],
     y_orig: Optional[np.ndarray] = None,
     size_obs: int = 10,
     size_reg: int = 10,
