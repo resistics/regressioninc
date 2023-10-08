@@ -3,7 +3,7 @@ Leverage points
 ^^^^^^^^^^^^^^^
 
 Leverage points are large points in the regressors that can have a significant
-influence on coefficient estimates. High leverage points can be considered
+influence on parameter estimates. High leverage points can be considered
 outliers with respect to independent variables or the regressors.
 
 For more information on leverage points, see:
@@ -19,11 +19,11 @@ from regressioninc.testing.complex import add_gaussian_noise, add_outliers, plot
 np.random.seed(42)
 
 # %%
-# Let's setup another linear regression problem with complex values.
-coef = np.array([0.5 + 2j, -3 - 1j])
+# Let's setup another linear problem with complex values.
+params = np.array([0.5 + 2j, -3 - 1j])
 grid_r1 = ComplexGrid(r1=0, r2=10, nr=11, i1=-5, i2=5, ni=11)
 grid_r2 = ComplexGrid(r1=-25, r2=-5, nr=11, i1=-5, i2=5, ni=11)
-X, y = generate_linear_grid(coef, [grid_r1, grid_r2], intercept=20 + 20j)
+X, y = generate_linear_grid(params, [grid_r1, grid_r2], intercept=20 + 20j)
 
 fig = plot_complex(X, y, {})
 fig.set_size_inches(7, 6)
@@ -47,7 +47,7 @@ for ireg in range(X.shape[1]):
     )
 np.random.seed(42)
 intercept = 20 + 20j
-y = np.matmul(X, coef) + intercept
+y = np.matmul(X, params) + intercept
 
 fig = plot_complex(X, y, {})
 fig.set_size_inches(7, 6)
@@ -56,14 +56,14 @@ plt.show()
 
 
 # %%
-# Solve the regression problem. Note that there is no noise on the observations
+# Solve the regression problem. Note that there is no noise on the regrassands
 # so whilst there are high leverage points in the regressors, everything is
 # consistent.
 X = add_intercept(X)
 model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model.estimate.params):
+    print(f"parameter {idx}: {params:.6f}")
 
 # %%
 # As a next stage, add some outliers to the data and see what happens.
@@ -77,8 +77,8 @@ for idx, coef in enumerate(model.coef_):
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(5, 5))
 model = OLS()
 model.fit(X, y_noise)
-for idx, coef in enumerate(model.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model.estimate.params):
+    print(f"parameter {idx}: {params:.6f}")
 
 fig = plot_complex(X, y_noise, {"least squares": model}, y_orig=y)
 fig.set_size_inches(7, 9)

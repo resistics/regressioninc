@@ -28,7 +28,7 @@ Next steps
    :maxdepth: 2
    :caption: User Guide:
 
-   design.rst
+   introduction.rst
    examples_complex_regression/index.rst
    examples_linear_models/index.rst
 
@@ -37,14 +37,12 @@ Next steps
    :caption: API Reference:
 
    regressioninc.rst
-   development.rst
 
 .. toctree::
    :maxdepth: 2
-   :caption: Literature:
+   :caption: Contributing:
 
-   references.rst
-
+   development.rst
 
 Indices and tables
 ==================

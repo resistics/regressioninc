@@ -1,2 +1,8 @@
-Variable name,Description
-regressor,test
+written name, description, variable name, otherwise known as
+regression, statistical processes for estimating relationship between dependent variable and one or more independent variables, N/A, regression analysis
+regressor, an independent variable, N/A, "independent variable, predictor variable, covariate, manipulated variable, explanatory variable, exposure variable, risk factor, feature, input variable, exogenous variable"
+regressors, a collection or regressor variables, X, see regressor
+regressand, the dependent variable, y, "response variable, regressand, criterion, predicted variable, measured variable, explained variable, experimental variable, responding variable, outcome variable, output variable, target, label, endogenous variable"
+parameters, the unknown parameters to be estimated, "params, somtimes with a trailing underscore", coefficients
+estimator, the model used to estimate the parameters, various or est, N/A
+sample, a subset of all the data, sample, N/A

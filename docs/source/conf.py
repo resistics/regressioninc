@@ -66,7 +66,8 @@ copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: "
 copybutton_prompt_is_regexp = True
 # pydantic configuration
 autodoc_pydantic_model_member_order = "bysource"
-autodoc_pydantic_model_show_field_summary = False
+autodoc_pydantic_model_show_json = False
+autodoc_pydantic_model_show_field_summary = True
 autodoc_pydantic_model_show_config_summary = False
 autodoc_pydantic_model_show_config_member = False
 autodoc_pydantic_model_show_validator_summary = False
@@ -80,8 +81,6 @@ sphinx_gallery_conf = {
     "filename_pattern": f"{re.escape(os.sep)}eg_",
     "ignore_pattern": f"{re.escape(os.sep)}temp_",
     "remove_config_comments": True,
-    "examples_dirs": ["../../examples"],
-    "gallery_dirs": ["gallery"],
     "thumbnail_size": (300, 300),
     "examples_dirs": [
         "../../examples/complex_regression",

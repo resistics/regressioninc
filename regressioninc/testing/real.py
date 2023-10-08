@@ -9,16 +9,16 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
-def generate_linear(coef: np.ndarray, n_samples: int, intercept: float = 0):
+def generate_linear(params: np.ndarray, n_samples: int, intercept: float = 0):
     """Generate real-valued linear testing data"""
-    n_features = coef.size
+    n_features = params.size
     if n_samples < n_features:
         raise ValueError(f"{n_samples=} must be >= {n_features=}")
 
     # generate the data
     shape = (n_samples, n_features)
     X = np.random.uniform(-20, 20, size=shape)
-    y = np.matmul(X, coef) + intercept
+    y = np.matmul(X, params) + intercept
     return X, y
 
 

@@ -13,15 +13,14 @@ Useful references:
 import numpy as np
 import matplotlib.pyplot as plt
 from regressioninc.linear.models import add_intercept, OLS
-from regressioninc.testing.complex import ComplexGrid
 
 # %%
 # One of the most straightforward linear problems to understand is the equation
 # of line. Let's look at a line with gradient 3 and intercept -2.
-coef = np.array([3])
+params = np.array([3])
 intercept = -2
 X = np.arange(-5, 5).reshape(10, 1)
-y = X * coef + intercept
+y = X * params + intercept
 
 fig = plt.figure()
 plt.scatter(y, X)
@@ -44,4 +43,4 @@ fig.show()
 X = add_intercept(X)
 model = OLS()
 model.fit(X, y)
-print(model.coef_)
+print(model.estimate.params)

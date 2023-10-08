@@ -41,27 +41,27 @@ Moving from complex-valued to real-valued results in the following
 - Doubling the number of regressors as we are now solving for the real and
   imaginary component of each regressor explicitly
 
-Usually, it is better to solve the problem with complex-values as outlined in 
+Usually, it is better to solve the problem with complex-values as outlined in
 this thread:
 
 https://stats.stackexchange.com/questions/66088/analysis-with-complex-data-anything-different
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from regressioninc.linear.models import add_intercept, OLS, M_estimate
+from regressioninc.linear.models import add_intercept, OLS, MEstimator
 from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
 from regressioninc.testing.complex import add_gaussian_noise
 from regressioninc.testing.complex import add_outliers, plot_complex
-from regressioninc.linear.models import complex_to_real, real_coef_to_complex
+from regressioninc.linear.models import complex_to_real, real_params_to_complex
 
 np.random.seed(42)
 
 # %%
 # Let's setup another linear regression problem with complex values
-coef = np.array([0.5 + 2j, -3 - 1j])
+params = np.array([0.5 + 2j, -3 - 1j])
 grid_r1 = ComplexGrid(r1=0, r2=10, nr=11, i1=-5, i2=5, ni=11)
 grid_r2 = ComplexGrid(r1=-25, r2=-5, nr=11, i1=-5, i2=5, ni=11)
-X, y = generate_linear_grid(coef, [grid_r1, grid_r2], intercept=20 + 20j)
+X, y = generate_linear_grid(params, [grid_r1, grid_r2], intercept=20 + 20j)
 
 fig = plot_complex(X, y, {})
 fig.set_size_inches(7, 6)
@@ -85,7 +85,7 @@ for ireg in range(X.shape[1]):
 np.random.seed(42)
 
 intercept = 20 + 20j
-y = np.matmul(X, coef) + intercept
+y = np.matmul(X, params) + intercept
 
 fig = plot_complex(X, y, {})
 fig.set_size_inches(7, 6)
@@ -98,16 +98,16 @@ plt.show()
 X = add_intercept(X)
 model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model.estimate.params):
+    print(f"parameter {idx}: {params:.6f}")
 
 # %%
 # Add some outliers
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(21, 21))
 model_ls = OLS()
 model_ls.fit(X, y_noise)
-for idx, coef in enumerate(model_ls.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model_ls.estimate.params):
+    print(f"parameter {idx}: {params:.6f}")
 
 fig = plot_complex(X, y_noise, {"least squares": model_ls}, y_orig=y)
 fig.set_size_inches(7, 9)
@@ -117,13 +117,13 @@ plt.show()
 # %%
 # Add some outliers
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(21, 21))
-model_mest = M_estimate()
+model_mest = MEstimator()
 model_mest.fit(X, y_noise)
-for idx, coef in enumerate(model_mest.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model_mest.estimate.params):
+    print(f"paramsficient {idx}: {params:.6f}")
 
 fig = plot_complex(
-    X, y_noise, {"least squares": model_ls, "M_estimate": model_mest}, y_orig=y
+    X, y_noise, {"least squares": model_ls, "M estimate": model_mest}, y_orig=y
 )
 fig.set_size_inches(7, 9)
 plt.tight_layout()
@@ -135,15 +135,15 @@ plt.show()
 X_real, y_real = complex_to_real(X, y_noise)
 model_ls = OLS()
 model_ls.fit(X_real, y_real)
-coef = real_coef_to_complex(model_ls.coef_)
-for idx, coef in enumerate(coef):
-    print(f"Coefficient {idx}: {coef:.6f}")
+params = real_params_to_complex(model_ls.estimate.params)
+for idx, params in enumerate(params):
+    print(f"parameter {idx}: {params:.6f}")
 
 
 # %%
 # Try running using real-valued M_estimates
-model_mest = M_estimate()
+model_mest = MEstimator()
 model_mest.fit(X_real, y_real)
-coef = real_coef_to_complex(model_mest.coef_)
-for idx, coef in enumerate(coef):
-    print(f"Coefficient {idx}: {coef:.6f}")
+params = real_params_to_complex(model_mest.estimate.params)
+for idx, params in enumerate(params):
+    print(f"parameter {idx}: {params:.6f}")

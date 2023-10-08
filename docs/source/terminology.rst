@@ -1,15 +1,12 @@
-Terminology and variable naming
--------------------------------
+Terminology
+^^^^^^^^^^^
 
-This page lists terminology used in regressioninc to help users 
-
-- model:
-- X: represents the independent variables
-- y: represents the dependent variables 
+As regression has been studied in many ways and in multiple fields, there is now
+a huge amount of terminology and different ways of saying the same thing. The
+table below describes the terminology used in the regression in C documentation
+and code.
 
 .. csv-table:: Variable names
    :file: terminology.csv
-   :widths: 30, 70
+   :widths: 20, 50, 20, 40
    :header-rows: 1
-
-

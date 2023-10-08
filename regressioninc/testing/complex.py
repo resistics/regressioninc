@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-from regressioninc.base import ComplexRegressorMixin
+from regressioninc.base import Estimator
 
 
 class ComplexGrid(BaseModel):
@@ -91,15 +91,15 @@ class ComplexGrid(BaseModel):
 
 
 def generate_linear_grid(
-    coef: np.ndarray, grids: list[ComplexGrid], intercept: complex = 0
+    params: np.ndarray, grids: list[ComplexGrid], intercept: complex = 0
 ) -> tuple[np.ndarray, np.ndarray]:
     """
-    Generate complex regression data from coefficients and grids of regressors
+    Generate complex regression data from parameters and grids of regressors
 
     Parameters
     ----------
-    coef : np.ndarray
-        The coefficients for the regressors
+    params : np.ndarray
+        The parameters of the linear function
     grids : list[ComplexGrid]
         The grid of points for each regressor
     intercept : complex, optional
@@ -114,33 +114,37 @@ def generate_linear_grid(
     ------
     ValueError
         If the number of grids provided does not equal the number of
-        coefficients
+        parameters
     ValueError
         If the grids have different numbers of points
     """
-    n_coef = coef.size
+    n_params = params.size
 
-    if (n_grids := len(grids)) != n_coef:
-        raise ValueError(f"{n_grids=} != {n_coef=}")
+    if (n_grids := len(grids)) != n_params:
+        raise ValueError(f"{n_grids=} != {n_params=}")
     pts = [g.n_pts for g in grids]
     if len(set(pts)) != 1:
         raise ValueError(f"The regressor grids have different numbers of points {pts}")
     n_pts = pts[0]
 
-    X = np.empty(shape=(n_pts, n_coef), dtype=complex)
-    for icoef in range(n_coef):
-        X[:, icoef] = np.squeeze(grids[icoef].flat_grid())
-    y = np.matmul(X, coef) + intercept
+    X = np.empty(shape=(n_pts, n_params), dtype=complex)
+    for iparam in range(n_params):
+        X[:, iparam] = np.squeeze(grids[iparam].flat_grid())
+    y = np.matmul(X, params) + intercept
     return X, y
 
 
 def generate_linear_random(
-    coef: np.ndarray, n_samples: int, intercept: complex = 0, min_rand=-10, max_rand=10
+    params: np.ndarray,
+    n_samples: int,
+    intercept: complex = 0,
+    min_rand=-10,
+    max_rand=10,
 ):
     """Produce complex data for testing without any noise"""
-    n_regressors = coef.size
+    n_regressors = params.size
     if n_samples is None:
-        n_samples = coef.size * 2
+        n_samples = params.size * 2
     if n_samples < n_regressors:
         raise ValueError(f"{n_samples=} must be >= {n_regressors=}")
     shape = (n_samples, n_regressors)
@@ -148,7 +152,7 @@ def generate_linear_random(
     X = np.random.uniform(min_rand, max_rand, size=shape)
     X = X.astype(complex) + 1.0j * np.random.uniform(-20, 20, size=shape)
     X = X.reshape(n_samples, n_regressors)
-    y = np.matmul(X, coef) + intercept
+    y = np.matmul(X, params) + intercept
     return X, y
 
 
@@ -262,7 +266,7 @@ def plot_estimate(
 def plot_complex(
     X,
     y,
-    models: dict[str, ComplexRegressorMixin],
+    models: dict[str, Estimator],
     y_orig: Optional[np.ndarray] = None,
     size_obs: int = 10,
     size_reg: int = 10,

@@ -20,9 +20,9 @@ np.random.seed(42)
 # Let's begin where the previous example ended.
 grid = ComplexGrid(r1=0, r2=10, nr=11, i1=-5, i2=5, ni=11)
 X = grid.flat_grid()
-coef = np.array([0.5 + 2j])
+params = np.array([0.5 + 2j])
 intercept = 20 + 20j
-y = np.matmul(X, coef) + intercept
+y = np.matmul(X, params) + intercept
 
 fig = plt.figure()
 for iobs in range(y.size):
@@ -51,12 +51,12 @@ plt.show()
 # %%
 # Let's add in a second regressor but rather than having a grid of input points
 # use some random input points.
-coef_random = np.array([2.7 - 1.8j])
-X_random, _ = generate_linear_random(coef_random, y.size)
-coef = np.concatenate((coef, coef_random))
+params_random = np.array([2.7 - 1.8j])
+X_random, _ = generate_linear_random(params_random, y.size)
+params = np.concatenate((params, params_random))
 X = np.concatenate((X, X_random), axis=1)
 intercept = 20 + 20j
-y = np.matmul(X, coef) + intercept
+y = np.matmul(X, params) + intercept
 
 fig = plot_complex(X, y, {})
 fig.set_size_inches(7, 6)
@@ -75,12 +75,12 @@ plt.tight_layout()
 plt.show()
 
 # %%
-# Now the coefficients can be solved for using the observations y and the
-# regressors X.
+# Now the parameters can be estimated using the regrassands y and the regressors
+# X.
 model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model.estimate.params):
+    print(f"parameter {idx}: {params:.6f}")
 
 # %%
 # Finally, the estimated model observations can be added to the visualisation.

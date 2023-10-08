@@ -6,7 +6,7 @@ Robust regression
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from regressioninc.linear.models import add_intercept, OLS, M_estimate
+from regressioninc.linear.models import add_intercept, OLS, MEstimator
 from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
 from regressioninc.testing.complex import add_gaussian_noise, add_outliers, plot_complex
 
@@ -14,10 +14,10 @@ np.random.seed(42)
 
 # %%
 # Let's setup another linear regression problem with complex values
-coef = np.array([0.5 + 2j, -3 - 1j])
+params = np.array([0.5 + 2j, -3 - 1j])
 grid_r1 = ComplexGrid(r1=0, r2=10, nr=11, i1=-5, i2=5, ni=11)
 grid_r2 = ComplexGrid(r1=-25, r2=-5, nr=11, i1=-5, i2=5, ni=11)
-X, y = generate_linear_grid(coef, [grid_r1, grid_r2], intercept=20 + 20j)
+X, y = generate_linear_grid(params, [grid_r1, grid_r2], intercept=20 + 20j)
 
 fig = plot_complex(X, y, {})
 fig.set_size_inches(7, 6)
@@ -41,7 +41,7 @@ for ireg in range(X.shape[1]):
 np.random.seed(42)
 
 intercept = 20 + 20j
-y = np.matmul(X, coef) + intercept
+y = np.matmul(X, params) + intercept
 
 fig = plot_complex(X, y, {})
 fig.set_size_inches(7, 6)
@@ -54,16 +54,16 @@ plt.show()
 X = add_intercept(X)
 model = OLS()
 model.fit(X, y)
-for idx, coef in enumerate(model.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model.estimate.params):
+    print(f"parameter {idx}: {params:.6f}")
 
 # %%
 # Add some outliers
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(21, 21))
 model_ls = OLS()
 model_ls.fit(X, y_noise)
-for idx, coef in enumerate(model_ls.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model_ls.estimate.params):
+    print(f"parameter {idx}: {params:.6f}")
 
 fig = plot_complex(X, y_noise, {"least squares": model_ls}, y_orig=y)
 fig.set_size_inches(7, 9)
@@ -73,13 +73,13 @@ plt.show()
 # %%
 # Add some outliers
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(21, 21))
-model_mest = M_estimate()
+model_mest = MEstimator(warm_start=True)
 model_mest.fit(X, y_noise)
-for idx, coef in enumerate(model_mest.coef_):
-    print(f"Coefficient {idx}: {coef:.6f}")
+for idx, params in enumerate(model_mest.estimate.params):
+    print(f"parameter {idx}: {params:.6f}")
 
 fig = plot_complex(
-    X, y_noise, {"least squares": model_ls, "M_estimate": model_mest}, y_orig=y
+    X, y_noise, {"least squares": model_ls, "M estimate": model_mest}, y_orig=y
 )
 fig.set_size_inches(7, 9)
 plt.tight_layout()

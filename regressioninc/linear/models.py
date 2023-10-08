@@ -6,17 +6,15 @@ complex-valued inputs. However, it does not output residuals for complex-valued
 variables, therefore these are calculated out explicitly.
 """
 from loguru import logger
-from typing import Optional
+from typing import Optional, Union
 import numpy as np
 import scipy.linalg as linalg
-from sklearn.linear_model._base import LinearModel
-from sklearn.utils.validation import _check_sample_weight, check_is_fitted
-from sklearn.utils.extmath import safe_sparse_dot
 import statsmodels.api as sm
 
-from regressioninc.base import ComplexRegressorMixin
-from regressioninc.validation import check_X_y
+from regressioninc.base import Estimate, Estimator
+from regressioninc.validation import validate_X_y, validate_weights
 from regressioninc.linear.robust import mad
+from regressioninc.errors import EstimatorError
 
 
 RobustNorm = sm.robust.norms.RobustNorm
@@ -103,25 +101,25 @@ def complex_to_real(X: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarra
     return X_real, y_real
 
 
-def real_coef_to_complex(coef: np.ndarray) -> np.ndarray:
+def real_params_to_complex(params: np.ndarray) -> np.ndarray:
     """
-    Convert real-valued coefficients to complex-valued one for problems that
+    Convert real-valued parameters to complex-valued ones for problems that
     were transformed from complex-valued to real-valued.
 
     Parameters
     ----------
-    coef : np.ndarray
-        Real-valued coefficients array
+    params : np.ndarray
+        Real-valued parameters array
 
     Returns
     -------
     np.ndarray
-        The complex-valued coefficients
+        The complex-valued parameters
 
     Examples
     --------
     Let's generate a complex-valued linear problem, pose it as a real-valued
-    linear problem and then convert the returned coefficients back to complex.
+    linear problem and then convert the returned parameters back to complex.
 
     Generate the linear problem and add an intercept column to the regressors
 
@@ -129,10 +127,10 @@ def real_coef_to_complex(coef: np.ndarray) -> np.ndarray:
     >>> np.set_printoptions(precision=3, suppress=True)
     >>> from regressioninc.testing.complex import ComplexGrid, generate_linear_grid
     >>> from regressioninc.linear.models import add_intercept, OLS
-    >>> from regressioninc.linear.models import complex_to_real, real_coef_to_complex
-    >>> coef = np.array([3 + 2j])
+    >>> from regressioninc.linear.models import complex_to_real, real_params_to_complex
+    >>> params = np.array([3 + 2j])
     >>> grid = ComplexGrid(r1=-1, r2=1, nr=3, i1=4, i2=6, ni=3)
-    >>> X, y = generate_linear_grid(coef, [grid], intercept=10)
+    >>> X, y = generate_linear_grid(params, [grid], intercept=10)
     >>> X = add_intercept(X)
 
     Convert the complex-valued problem to a real-valued problem
@@ -147,18 +145,20 @@ def real_coef_to_complex(coef: np.ndarray) -> np.ndarray:
 
     Look at the real-valued coefficients
 
-    >>> model.coef_
+    >>> model.estimate.params
     array([ 3.,  2., 10.,  0.])
 
     Convert the coefficients back to the complex domain
 
-    >>> real_coef_to_complex(model.coef_)
+    >>> real_params_to_complex(model.estimate.params)
     array([ 3.+2.j, 10.+0.j])
     """
-    return coef[0::2] + 1j * coef[1::2]
+    return params[0::2] + 1j * params[1::2]
 
 
-def _apply_sample_weights(X, y, sample_weight):
+def apply_weights(
+    X: np.ndarray, y: np.ndarray, weights: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     r"""
     Transform X and y using the weights to perform a weighted least squares
 
@@ -174,71 +174,95 @@ def _apply_sample_weights(X, y, sample_weight):
 
     In this method, both the observations y and the predictors X are multipled
     by the square root of the weights and then returned.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        The regressors
+    y : np.ndarray
+        The regressands
+    weights : np.ndarray
+        The weights
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        The weighted regressors and the weights regrassands
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> X = [5, 3]
+    >>> y = [2, 8]
+    >>> weights = []
     """
-    sample_weight = _check_sample_weight(
-        sample_weight, X, dtype=X.dtype, only_non_negative=True
-    )
-    sqrt = np.sqrt(sample_weight)
+    weights = validate_weights(weights, X, non_negative=True)
+    sqrt = np.sqrt(weights)
     y = sqrt * y
     X = X * sqrt[..., np.newaxis]
     return X, y
 
 
-def _lstsq(
+class LinearEstimate(Estimate):
+    """A linear estimate"""
+
+    residues: Union[float, np.ndarray]
+    rank: int
+    singular_values: Union[None, np.ndarray]
+
+
+class LinearEstimator(Estimator):
+    """Base class for a linear estimator"""
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Predict regrassands given regressors using the estimated parameters
+
+        Parameters
+        ----------
+        X : np.ndarray
+            The regressors
+
+        Returns
+        -------
+        np.ndarray
+            The regressands
+
+        Raises
+        ------
+        EstimatorError
+            If no estimate exists
+        """
+        if self.estimate is None:
+            raise EstimatorError("No estimated parameters have been calculated")
+        return np.dot(X, self.estimate.params.T)
+
+
+def lstsq(
     X: np.ndarray,
     y: np.ndarray,
-    sample_weight: Optional[np.ndarray] = None,
+    weights: Optional[np.ndarray] = None,
     cond=None,
     overwrite_a=False,
     overwrite_b=False,
     check_finite=True,
     lapack_driver=None,
 ):
-    """
-    A function to implement ordinary least squares
-
-    This function wraps the scipy.linalg.lstsq least squares implementation.
-    Rather than use that directly, have implemented this in case support for
-    complex-values is later removed from scipy and another package needs to be
-    used.
-    """
-    if sample_weight is not None:
-        X, y = _apply_sample_weights(X, y, sample_weight)
-    return linalg.lstsq(
+    """OLS from scipy wrapped here in case support for complex is dropped"""
+    if weights is not None:
+        X, y = apply_weights(X, y, weights)
+    params, residues, rank, singular_values = linalg.lstsq(
         X, y, cond, overwrite_a, overwrite_b, check_finite, lapack_driver
+    )
+    return LinearEstimate(
+        params=params, residues=residues, rank=rank, singular_values=singular_values
     )
 
 
-class ComplexLinearModel(LinearModel):
-    """A LinearModel base class the supports complex data"""
+class OLS(LinearEstimator):
+    """Ordinary least square regression"""
 
-    def _decision_function(self, X):
-        check_is_fitted(self)
-
-        # X = self._validate_data(X, accept_sparse=["csr", "csc", "coo"], reset=False)
-        return safe_sparse_dot(X, self.coef_.T, dense_output=True)
-
-    def predict(self, X):
-        """
-        Predict using the linear model.
-
-        Parameters
-        ----------
-        X : array-like or sparse matrix, shape (n_samples, n_features)
-            Samples.
-
-        Returns
-        -------
-        C : array, shape (n_samples,)
-            Returns predicted values.
-        """
-        return self._decision_function(X)
-    
-
-class OLS(ComplexRegressorMixin, ComplexLinearModel):
-    """Standard linear regression"""
-
-    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def fit(self, X: np.ndarray, y: np.ndarray):
         """
         Fit the linear problem using least squares regression
 
@@ -254,17 +278,15 @@ class OLS(ComplexRegressorMixin, ComplexLinearModel):
         np.ndarray
             The coefficients
         """
-        X, y = check_X_y(X, y)
-        self.coef_, self.residuals_, self.rank_, self.singular_ = _lstsq(X, y)
+        X, y = validate_X_y(X, y)
+        self.estimate = lstsq(X, y)
         return self
 
 
-class WLS(ComplexRegressorMixin, ComplexLinearModel):
+class WLS(LinearEstimator):
     """Weighted least squares"""
 
-    def fit(
-        self, X: np.ndarray, y: np.ndarray, sample_weight: np.ndarray
-    ) -> np.ndarray:
+    def fit(self, X: np.ndarray, y: np.ndarray, weights: np.ndarray) -> np.ndarray:
         """
         Apply weights to observations and predictors and find the coefficients
         of the linear model
@@ -275,7 +297,7 @@ class WLS(ComplexRegressorMixin, ComplexLinearModel):
             The predictors
         y : np.ndarray
             The observations
-        sample_weight : np.ndarray
+        weights : np.ndarray
             The weights to apply to the samples
 
         Returns
@@ -283,24 +305,23 @@ class WLS(ComplexRegressorMixin, ComplexLinearModel):
         np.ndarray
             The coefficients for the model
         """
-        X, y = check_X_y(X, y)
-        self.coef_, self.residuals_, self.rank_, self.singular_ = _lstsq(
-            X, y, sample_weight=sample_weight
-        )
+        X, y = validate_X_y(X, y)
+        self.estimate = lstsq(X, y, weights=weights)
         return self
 
 
-class M_estimate(ComplexRegressorMixin, ComplexLinearModel):
-    def __init__(
-        self,
-        max_iter: int = 50,
-        early_stopping: float = 1e-8,
-        warm_start: bool = False,
-    ):
-        """Something here"""
-        self.max_iter = max_iter
-        self.early_stopping = early_stopping
-        self.warm_start = warm_start
+class MEstimate(LinearEstimate):
+    scale: float
+    """An estimate of scale to be used weighting the rows of the linear problem"""
+
+
+class MEstimator(LinearEstimator):
+    max_iter: int = 50
+    """The maximum number of iterations"""
+    early_stopping: float = 1e-8
+    """Minimum change required in residues between iterations to continue"""
+    warm_start: bool = False
+    """Use existing solution to initialise a new call to fit"""
 
     def fit(
         self,
@@ -311,13 +332,13 @@ class M_estimate(ComplexRegressorMixin, ComplexLinearModel):
         if M is None:
             M = sm.robust.norms.TrimmedMean()
 
-        if not self.warm_start or not hasattr(self, "coef_"):
+        if not self.warm_start or self.estimate is None:
             # do an initial least squares solution
-            logger.info("Here")
-            self.coef_, self.residuals_, self.rank_, self.singular_ = _lstsq(X, y)
+            ols_estimate = lstsq(X, y)
+            self.estimate = MEstimate(**ols_estimate.model_dump(), scale=0)
 
-        resids = y - np.dot(X, self.coef_.T)
-        self.scale_ = mad(resids, center=0)
+        resids = y - np.dot(X, self.estimate.params.T)
+        self.estimate.scale = mad(resids, center=0)
         prev_resids = np.absolute(resids).real
         iter = 0
         while iter < self.max_iter:
@@ -325,17 +346,18 @@ class M_estimate(ComplexRegressorMixin, ComplexLinearModel):
             if np.sum(prev_resids) < self.early_stopping:
                 logger.debug(f"{prev_resids=} residuals small, quitting")
                 break
-            if self.scale_ == 0.0:
-                logger.debug(f"{self.scale_=}, suggests near perfect fit last iteration")
+            if self.estimate.scale == 0.0:
+                logger.debug(
+                    f"{self.estimate.scale=}, suggests near perfect fit last iteration"
+                )
                 break
 
             # perform another solving iteration
-            sample_weight = M.weights(prev_resids / self.scale_)
-            self.coef_, self.residuals_, self.rank_, self.singular_ = _lstsq(
-                X, y, sample_weight=sample_weight
-            )
-            resids = y - np.dot(X, self.coef_.T)
-            self.scale_ = mad(resids, center=0)
+            weights = M.weights(prev_resids / self.estimate.scale)
+            new_estimate = lstsq(X, y, weights=weights)
+            resids = y - np.dot(X, new_estimate.params.T)
+            scale = mad(resids, center=0)
+            self.estimate = MEstimate(**new_estimate.model_dump(), scale=scale)
             abs_resids = np.absolute(resids).real
 
             # check the change in residuals and quit if insignificant
