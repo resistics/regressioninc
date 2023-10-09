@@ -80,12 +80,12 @@ def geometric_median(arr: np.ndarray) -> np.complex_:
         >>> plt.scatter(med.real, med.imag, c="r", marker="o") # doctest: +SKIP
         >>> plt.tight_layout() # doctest: +SKIP
         >>> plt.show() # doctest: +SKIP
-    
+
     .. plot::
 
         >>> import matplotlib.pyplot as plt
         >>> import numpy as np
-        >>> from regressioninc.math import geometric_median    
+        >>> from regressioninc.math import geometric_median
         >>> arr = np.array([3 - 2j, -4 - 9j, 2 + 1j, -3 + 6j])
         >>> med = geometric_median(arr)
         >>> print(np.round(med, 6))
