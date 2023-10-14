@@ -12,6 +12,7 @@ np.random.seed(42)
 @pytest.mark.parametrize(
     "params, n_samples, intercept, expected",
     [
+        ([2.0], 20, 0, [2.0]),
         ([3.0, -7.0], 10, 0, [3.0, -7.0]),
         ([3.0, -7.0], 20, 10, [3.0, -7.0, 10]),
         ([17.2, 23.6, -50.2], 25, 0, [17.2, 23.6, -50.2]),
@@ -38,6 +39,12 @@ def test_OLS_real(
 @pytest.mark.parametrize(
     "params, n_samples, intercept, expected",
     [
+        (
+            [2.0 - 7.0j],
+            10,
+            0,
+            [2.0 - 7.0j],
+        ),
         (
             [3.0 + 6j, -7.0 + 3j],
             5,
