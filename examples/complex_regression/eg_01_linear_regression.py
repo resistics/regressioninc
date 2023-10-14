@@ -18,11 +18,11 @@ from regressioninc.testing.complex import ComplexGrid
 
 # %%
 # One of the most straightforward linear problems to understand is the equation
-# of line. Let's look at a line with gradient 3 and intercept -2.
+# of a line. Let's look at a line with gradient 3 and intercept -2.
 params = np.array([3])
 intercept = -2
 X = np.arange(-5, 5).reshape(10, 1)
-y = X * params + intercept
+y = np.matmul(X, params) + intercept
 
 fig = plt.figure()
 plt.scatter(y, X)
@@ -40,7 +40,7 @@ fig.show()
 #
 # This can be done with linear regression, and the most common method of linear
 # regression is least squares, which aims to estimate the parameters whilst
-# minimising the squared misfit between the regrassands and estimated
+# minimising the squared misfit between the regrassands and predicted
 # regrassands calculated using the estimated parameters.
 X = add_intercept(X)
 model = OLS()
@@ -49,8 +49,12 @@ print(model.estimate.params)
 
 # %%
 # Least squares was able to correctly calculate the slope and intercept for the
-# real-valued regression problem.
-#
+# real-valued regression problem. Let's look at the predicted regrassands using
+# the estimated parameters.
+preds = model.predict(X)
+print(preds)
+
+# %%
 # It is also possible to have linear problems in the complex domain. These
 # commonly occur in signal processing problems. Let's define parameters and
 # regressors X and calculate out the regrassands y for an example problem.
@@ -78,14 +82,14 @@ plt.show()
 # Visualsing the regressors X and the regrassands y this way gives a geometric
 # indication of the linear problem in the complex domain. Multiplying the
 # regressors by the parameters can be considered like a scaling and a rotation
-# of the independent variables to give the depedent variables y.
+# of the independent variables to give the dependent variables y.
 #
-# With more samples, this can be a bit easier to visualise. In the below example
-# regressors and regrassands are generated again, this time with more samples.
-# To start off with, the parameter is a real number to demonstrate the scaling
-# without any rotation. Both the regressors and regrassands are plotted on the
-# same axis with lines to show the mapping between independent and dependent
-# values.
+# With more samples, this can be a bit easier to visualise. In the below
+# example, regressors and regrassands are generated again, this time with more
+# samples. To start off with, the parameter is a real number to demonstrate the
+# scaling without any rotation. Both the regressors and regrassands are plotted
+# on the same axis with lines to show the mapping between independent and
+# dependent values.
 grid = ComplexGrid(r1=0, r2=10, nr=11, i1=-5, i2=5, ni=11)
 X = grid.flat_grid()
 params = np.array([0.5])
@@ -160,7 +164,7 @@ plt.show()
 # the values of the parameters for the complex-valued problem. Again, least
 # squares is one of the most common methods of linear regression. However, not
 # all least squares algorithms support complex data, though some do such as the
-# least squares in scipy. The focus of regressioninc is to provide regression
+# least squares in Scipy. The focus of regression in C is to provide regression
 # methods for complex-valued data.
 #
 # Note that adding an intercept column to X allows for solving of the intercept.

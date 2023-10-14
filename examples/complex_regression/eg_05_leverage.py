@@ -66,14 +66,7 @@ for idx, params in enumerate(model.estimate.params):
     print(f"parameter {idx}: {params:.6f}")
 
 # %%
-# As a next stage, add some outliers to the data and see what happens.
-
-# y_noise = add_outliers(
-#     y,
-#     outlier_percent=20,
-#     mult_min=7,
-#     mult_max=10,
-# )
+# As a next stage, add some noise to the data and see what happens.
 y_noise = add_gaussian_noise(y, loc=(0, 0), scale=(5, 5))
 model = OLS()
 model.fit(X, y_noise)

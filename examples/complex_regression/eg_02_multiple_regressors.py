@@ -83,7 +83,8 @@ for idx, params in enumerate(model.estimate.params):
     print(f"parameter {idx}: {params:.6f}")
 
 # %%
-# Finally, the estimated model observations can be added to the visualisation.
+# Finally, the predicted regressands calculated from the estimated parameters
+# can be added to the visualisation.
 fig = plot_complex(X, y, {"least squares": model})
 fig.set_size_inches(7, 9)
 plt.tight_layout()
