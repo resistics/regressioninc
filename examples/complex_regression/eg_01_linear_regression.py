@@ -12,6 +12,7 @@ Useful references:
 """
 # sphinx_gallery_thumbnail_number = 5
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from regressioninc.linear.models import add_intercept, OLS
 from regressioninc.testing.complex import ComplexGrid
@@ -24,25 +25,49 @@ intercept = -2
 X = np.arange(-5, 5).reshape(10, 1)
 y = np.matmul(X, params) + intercept
 
+# %%
+# The above code is essentially doing the following:
+#
+# .. math::
+#
+#   y = mx + c
+#
+# where :math:`m = 3` and :math:`c = -2` with the regressor going from -5 to 4
+# in steps of 1.
+#
+# Let's have a quick look at the values, noting that there is only a single
+# regressor, which is in the first column (index 0) of X.
+print(f"Regressors X {X[:, 0]}")
+print(f"Regrassand y {y}")
+
+# %%
+# And now plot the relationship between the regressors X and regrassand y.
 fig = plt.figure()
-plt.scatter(y, X)
+plt.scatter(X[:, 0], y)
 plt.xlabel("Independent variable")
 plt.ylabel("Dependent variable")
 plt.tight_layout()
 fig.show()
 
 # %%
-# When performing linear regressions, the aim is to:
+# When performing linear regression, the aim is to:
 #
 # - calculate the parameters (also called coefficients)
 # - given the regressors X (values of the independent variable)
-# - and values of the regrassands y (values of the dependent variable)
+# - and values of the regrassand y (values of the dependent variable)
 #
 # This can be done with linear regression, and the most common method of linear
 # regression is least squares, which aims to estimate the parameters whilst
 # minimising the squared misfit between the regrassands and predicted
 # regrassands calculated using the estimated parameters.
+#
+# Before solving, let's add a row of 1s to our regressors X. This is to make
+# sure a constant intercept is also solved for.
 X = add_intercept(X)
+print(X.T)
+
+# %%
+# Now use ordinary least squares to estimate the parameters.
 model = OLS()
 model.fit(X, y)
 print(model.estimate.params)
@@ -57,10 +82,17 @@ print(preds)
 # %%
 # It is also possible to have linear problems in the complex domain. These
 # commonly occur in signal processing problems. Let's define parameters and
-# regressors X and calculate out the regrassands y for an example problem.
+# regressors X and generate the corresponding regrassand y for an example
+# problem. For the time being, there is no intercept.
 params = np.array([2 + 3j])
 X = np.array([1 + 1j, 2 + 1j, 3 + 1j, 1 + 2j, 2 + 2j, 3 + 2j]).reshape(6, 1)
 y = np.matmul(X, params)
+
+# %%
+# Let's have a quick look at the values, again noting that there is only a
+# single regressor.
+print(f"Regressors X {X[:, 0]}")
+print(f"Regrassand y {y}")
 
 # %%
 # It is a bit harder to visualise the complex-valued version, but let's try and
@@ -75,19 +107,19 @@ plt.sca(axs[1])
 plt.scatter(y.real, y.imag, c="tab:red")
 plt.xlim(y.real.min() - 3, y.real.max() + 3)
 plt.ylim(y.imag.min() - 3, y.imag.max() + 3)
-plt.title("Regrassands y")
+plt.title("Regrassand y")
 plt.show()
 
 # %%
-# Visualsing the regressors X and the regrassands y this way gives a geometric
+# Visualsing the regressors X and the regrassand y this way gives a geometric
 # indication of the linear problem in the complex domain. Multiplying the
 # regressors by the parameters can be considered like a scaling and a rotation
 # of the independent variables to give the dependent variables y.
 #
 # With more samples, this can be a bit easier to visualise. In the below
-# example, regressors and regrassands are generated again, this time with more
+# example, regressors and the regresand are generated again, this time with more
 # samples. To start off with, the parameter is a real number to demonstrate the
-# scaling without any rotation. Both the regressors and regrassands are plotted
+# scaling without any rotation. Both the regressors and regrassand are plotted
 # on the same axis with lines to show the mapping between independent and
 # dependent values.
 grid = ComplexGrid(r1=0, r2=10, nr=11, i1=-5, i2=5, ni=11)
@@ -103,18 +135,18 @@ for iobs in range(y.size):
         color="k",
         lw=0.5,
     )
-plt.scatter(X.real, X.imag, c="tab:blue", label="Regressors")
+plt.scatter(X.real, X.imag, c="tab:blue", label="Regressor")
 plt.grid()
-plt.title("Regressors X")
-plt.scatter(y.real, y.imag, c="tab:red", label="Regrassands")
+plt.title("Regressor X")
+plt.scatter(y.real, y.imag, c="tab:red", label="Regrassand")
 plt.grid()
 plt.legend()
 plt.title("Complex regression")
 plt.show()
 
 # %%
-# Now let's add a complex component to the coefficient to demonstrate the
-# rotational aspect.
+# Now let's add a complex component to the parameter (coefficient) to
+# demonstrate the rotational aspect.
 params = np.array([0.5 + 2j])
 y = np.matmul(X, params)
 
@@ -126,10 +158,10 @@ for iobs in range(y.size):
         color="k",
         lw=0.5,
     )
-plt.scatter(X.real, X.imag, c="tab:blue", label="Regressors")
+plt.scatter(X.real, X.imag, c="tab:blue", label="Regressor")
 plt.grid()
 plt.title("Regressors X")
-plt.scatter(y.real, y.imag, c="tab:red", label="Regrassands")
+plt.scatter(y.real, y.imag, c="tab:red", label="Regrassand")
 plt.grid()
 plt.legend()
 plt.title("Complex regression")
@@ -149,10 +181,10 @@ for iobs in range(y.size):
         color="k",
         lw=0.3,
     )
-plt.scatter(X.real, X.imag, c="tab:blue", label="Regressors")
+plt.scatter(X.real, X.imag, c="tab:blue", label="Regressor")
 plt.grid()
 plt.title("Regressors X")
-plt.scatter(y.real, y.imag, c="tab:red", label="Regrassands")
+plt.scatter(y.real, y.imag, c="tab:red", label="Regrassand")
 plt.grid()
 plt.legend()
 plt.title("Complex regression")
@@ -164,13 +196,29 @@ plt.show()
 # the values of the parameters for the complex-valued problem. Again, least
 # squares is one of the most common methods of linear regression. However, not
 # all least squares algorithms support complex data, though some do such as the
-# least squares in Scipy. The focus of regression in C is to provide regression
-# methods for complex-valued data.
+# least squares in Scipy. The focus of |pkgnm| is to provide regression methods
+# for complex-valued data.
 #
 # Note that adding an intercept column to X allows for solving of the intercept.
-# Regression in C does not automatically solve for the intercept and if desired,
-# an intercept column needs to be added to the regressors.
+# |pkgnm| does not automatically solve for the intercept and if desired, an
+# intercept column needs to be added to the regressors X, similar to the
+# real-valued example shown at the top of the page.
 X = add_intercept(X)
 model = OLS()
 model.fit(X, y)
 print(model.estimate.params)
+
+# %%
+# Finally, let's compare the actual regressand y to the predicted regrassand
+# calculated from the regressors X and the estimated parameters.
+preds = model.predict(X)
+df = pd.DataFrame(
+    data={
+        "Regressor X": X[:, 0],
+        "parameter": params[0],
+        "intercept": intercept,
+        "regressand y": y,
+        "predicted y": preds,
+    }
+)
+print(df)
