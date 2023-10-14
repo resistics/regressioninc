@@ -13,7 +13,7 @@ mathematically as:
 
    Y_i = f(X_i, \beta) + e_i \quad \textrm{with} \quad i = 1,..,n,
 
-where
+where,
 
 - :math:`Y_i` is the dependent variable or the **regressand**
 - :math:`X_i` are the independent variables or the **regressors**
