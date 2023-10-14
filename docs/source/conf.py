@@ -10,7 +10,7 @@ import re
 import regressioninc
 from sphinx_gallery.sorting import FileNameSortKey
 
-project = "Regression in C"
+project = "regressioninc"
 copyright = "2022, Neeraj Shah"
 author = "Neeraj Shah"
 release = regressioninc.__version__
@@ -77,7 +77,7 @@ autodoc_pydantic_field_show_default = True
 # sphinx gallery
 image_scrapers = "matplotlib"
 sphinx_gallery_conf = {
-    "run_stale_examples": True,
+    "run_stale_examples": False,
     "filename_pattern": f"{re.escape(os.sep)}eg_",
     "ignore_pattern": f"{re.escape(os.sep)}temp_",
     "remove_config_comments": True,
@@ -99,7 +99,14 @@ sphinx_gallery_conf = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
+html_title = f"regressioninc {release}"
 html_static_path = ["_static"]
 html_theme_options = {
     "navigation_with_keys": True,
 }
+
+
+# -- RST epilog --------------------------------------------------------------
+# https://stackoverflow.com/questions/10030149/how-do-i-output-a-config-value-in-a-sphinx-rst-file/10042061#10042061
+pkg_name = "RegressionInC"
+rst_epilog = f".. |pkgnm| replace:: {pkg_name}"

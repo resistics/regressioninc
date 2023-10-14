@@ -3,32 +3,52 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to regressioninc's documentation!
-=========================================
+RegressionInC docs
+==================
 
-Regression in C (RegressionInC) is a package focussing on regression for complex-valued
-problems. There are already multiple packages for regression in Python, however
-these offer varying amounts of support for the complex-valued variables. Numpy's
-least squares implementation has partial support for complex-valued variables
-and other packages support multi-target regression, which can be used for
-complex-valued problems, but again support is spotty.
+*Regression*\ In\ *C* (regressioninc) is a package focussing on regression for
+complex-valued data.
 
-This package is currently being developed. The plan for current and future
-development includes:
+There are already multiple packages for regression in Python, however these
+offer varying amounts of support for the complex-valued variables. Scipy's least
+squares implementation has partial support for complex-valued variables and
+other packages support multi-target regression, which can be used for
+complex-valued problems, but again support is spotty. |pkgnm| fills the gap for
+complex-valued regression.
 
-- Least squares and weighted least squares implementation
-- Visualisation of complex-valued linear problems
-- Robust linear regression for complex-valued variables
-- Uncertainty estimation
+.. warning::
+
+   This package is currently being developed and its API is liable to change in
+   the early stages.
+
+Installation
+------------
+
+|pkgnm| can be installed from
+`PYPI <https://pypi.org/project/regressioninc/>`_ as normal.
+
+.. code::
+
+   pip install regressioninc
+
+Or if you are a poetry user
+
+.. code::
+
+   poetry add regressioninc
 
 Next steps
 ----------
+
+First time users and those new to complex-valued regression are directed towards
+the introduction page and basic exmaples.
 
 .. toctree::
    :maxdepth: 2
    :caption: User Guide:
 
    introduction.rst
+   terminology.rst
    examples_complex_regression/index.rst
    examples_linear_models/index.rst
 
