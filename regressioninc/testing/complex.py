@@ -94,7 +94,8 @@ def generate_linear_grid(
     params: np.ndarray, grids: list[ComplexGrid], intercept: complex = 0
 ) -> tuple[np.ndarray, np.ndarray]:
     """
-    Generate complex regression data from parameters and grids of regressors
+    Generate complex-valued regression data from parameters and grids of
+    regressors
 
     Parameters
     ----------
@@ -134,6 +135,22 @@ def generate_linear_grid(
     return X, y
 
 
+def generate_random_regressors(
+    n_regressors: int,
+    n_samples: int,
+    min_rand=-10,
+    max_rand=10,
+):
+    """Produce random complex-values for the regressors"""
+    if n_samples < n_regressors:
+        raise ValueError(f"{n_samples=} must be >= {n_regressors=}")
+    shape = (n_samples, n_regressors)
+    # generate the data
+    X = np.random.uniform(min_rand, max_rand, size=shape)
+    X = X.astype(complex) + 1.0j * np.random.uniform(-20, 20, size=shape)
+    return X.reshape(n_samples, n_regressors)
+
+
 def generate_linear_random(
     params: np.ndarray,
     n_samples: int,
@@ -142,16 +159,7 @@ def generate_linear_random(
     max_rand=10,
 ):
     """Produce complex data for testing without any noise"""
-    n_regressors = params.size
-    if n_samples is None:
-        n_samples = params.size * 2
-    if n_samples < n_regressors:
-        raise ValueError(f"{n_samples=} must be >= {n_regressors=}")
-    shape = (n_samples, n_regressors)
-    # generate the data
-    X = np.random.uniform(min_rand, max_rand, size=shape)
-    X = X.astype(complex) + 1.0j * np.random.uniform(-20, 20, size=shape)
-    X = X.reshape(n_samples, n_regressors)
+    X = generate_random_regressors(params.size, n_samples, min_rand, max_rand)
     y = np.matmul(X, params) + intercept
     return X, y
 
@@ -176,7 +184,7 @@ def add_outliers(
     random_signs_real: bool = False,
     random_signs_imag: bool = False,
 ) -> np.ndarray:
-    """Add outliers to a complex-valued 1-D observations array"""
+    """Add outliers to a complex-valued 1-D regressand array"""
     if mult_min >= mult_max:
         raise ValueError(f"{mult_min=} must be less than {mult_max=}")
 
@@ -198,16 +206,16 @@ def add_outliers(
         signs = np.random.randint(0, 2, size=n_outliers) * 2 - 1
         outliers_i = outliers_i * signs
     outliers = outliers_r + 1j * outliers_i
-    # add to observations
-    logger.debug(f"Adding {n_outliers=} to observations")
+    # add to regressand
+    logger.debug(f"Adding {n_outliers=} to regressand")
     outlier_indices = np.random.randint(0, n_samples, size=n_outliers)
     y_new = np.array(y)
     y_new[outlier_indices] = y_new[outlier_indices] + outliers
     return y_new
 
 
-def plot_observations(y: np.ndarray, size: int = 10, alpha: float = 1.0) -> None:
-    """Plot observation data"""
+def plot_regressand(y: np.ndarray, size: int = 10, alpha: float = 1.0) -> None:
+    """Plot regressand data"""
     plt.scatter(
         y.real,
         y.imag,
@@ -218,13 +226,13 @@ def plot_observations(y: np.ndarray, size: int = 10, alpha: float = 1.0) -> None
         alpha=alpha,
         label="y",
     )
-    plt.title("Observations")
+    plt.title("Regressand")
 
 
-def plot_observations_original(
+def plot_regressand_original(
     y_orig: np.ndarray, size: int = 10, alpha: float = 1.0
 ) -> None:
-    """Plot original observations, meant for data without noise"""
+    """Plot original regressand, meant for data without noise"""
     plt.scatter(
         y_orig.real,
         y_orig.imag,
@@ -235,7 +243,7 @@ def plot_observations_original(
         alpha=alpha,
         label="y original",
     )
-    plt.title("Observations original")
+    plt.title("Regressand original")
 
 
 def plot_regressor(
@@ -273,22 +281,22 @@ def plot_complex(
     size_est: int = 10,
 ):
     """Plot the complex data"""
-    n_observations = 1 if y_orig is None else 2
+    n_regressand = 1 if y_orig is None else 2
     n_regressors = X.shape[1]
     n_models = len(models)
     n_rows = 2 if n_models == 0 else 3
-    n_cols = max([n_observations, n_regressors, n_models])
-    logger.info(f"{n_rows=}")
-    logger.info(f"{n_cols=}")
+    n_cols = max([n_regressand, n_regressors, n_models])
+    logger.debug(f"{n_rows=}")
+    logger.debug(f"{n_cols=}")
 
     fig = plt.figure()
-    # plot the observations
+    # plot the regressand
     plt.subplot(n_rows, n_cols, 1)
-    plot_observations(y, size=size_obs)
+    plot_regressand(y, size=size_obs)
     if y_orig is not None:
         plt.subplot(n_rows, n_cols, 2)
-        plot_observations(y, size=size_obs, alpha=0.1)
-        plot_observations_original(y_orig, size=size_obs)
+        plot_regressand(y, size=size_obs, alpha=0.1)
+        plot_regressand_original(y_orig, size=size_obs)
         plt.legend()
 
     # plot the regressors
@@ -308,9 +316,9 @@ def plot_complex(
         model = models[name]
         y_est = model.predict(X)
         plot_estimate(y_est, color=color, size=size_est, label=name)
-        plot_observations(y, size=size_obs, alpha=0.1)
+        plot_regressand(y, size=size_obs, alpha=0.1)
         if y_orig is not None:
-            plot_observations_original(y_orig, size=size_obs, alpha=0.4)
+            plot_regressand_original(y_orig, size=size_obs, alpha=0.4)
         plt.title(name)
 
     plt.tight_layout()

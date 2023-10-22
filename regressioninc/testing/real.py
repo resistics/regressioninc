@@ -52,7 +52,7 @@ def add_outliers(
     outlier_percent: float = 5,
     outlier_mult=3,
 ) -> np.ndarray:
-    """Add outliers to a 1-D observations array"""
+    """Add outliers to a 1-D regressand array"""
     if outlier_percent == 0:
         logger.debug("No outliers being added, function call is redundant")
         return y
@@ -64,8 +64,8 @@ def add_outliers(
     # signs = np.random.randint(0, 2, size=n_outliers) * 2 - 1
     signs = np.ones_like(outliers)
     outliers = outliers * signs
-    # add to observations
-    logger.debug(f"Adding {n_outliers=} to observations")
+    # add to regressand
+    logger.debug(f"Adding {n_outliers=} to regressand")
     outlier_indices = np.random.randint(0, n_samples, size=n_outliers)
     y[outlier_indices] = y[outlier_indices] + outliers
     return y
@@ -90,7 +90,7 @@ def plot_1d(
         raise ValueError(f"{ydim=} != 1")
 
     fig = plt.figure()
-    plt.scatter(X, y, label="Observations")
+    plt.scatter(X, y, label="Regressand")
     # plot the parameters
     for label, (coef, intercept) in coefs.items():
         y_pred = X * coef + intercept
@@ -126,7 +126,7 @@ def plot_2d(
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(X[:, 0], X[:, 1], y, label="Observations")
+    ax.scatter(X[:, 0], X[:, 1], y, label="Regressand")
     # plot the planes
     X_plane = get_X_plane(X)
     labels = list(coefs.keys())
