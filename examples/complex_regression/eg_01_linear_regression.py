@@ -1,21 +1,33 @@
-r"""
+"""
 Linear regression
 ^^^^^^^^^^^^^^^^^
 
 This example begins with linear regression in the real domain and then builds up
 to show how linear problems can be thought of in the complex domain.
 
+The Wikipedia entry is a useful starting point for those unfamiliar with linear
+regression.
+
+- https://en.wikipedia.org/wiki/Linear_regression
+
 Useful references:
 
 - https://stats.stackexchange.com/questions/66088/analysis-with-complex-data-anything-different
 - https://www.chrishenson.net/article/complex_regression
+
+
+Begin the example by importing packages/functions and switching off the logger
+to avoid superfluous messages.
 """
 # sphinx_gallery_thumbnail_number = 5
+from loguru import logger
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from regressioninc.linear.models import add_intercept, OLS
 from regressioninc.testing.complex import ComplexGrid
+
+logger.remove()
 
 # %%
 # One of the most straightforward linear problems to understand is the equation
@@ -36,7 +48,9 @@ y = np.matmul(X, params) + intercept
 # in steps of 1.
 #
 # Let's have a quick look at the values, noting that there is only a single
-# regressor, which is in the first column (index 0) of X.
+# regressor, which is in the first column (index 0) of X. The variable name X
+# represents the values of one or more regressors and is usually referred to as
+# the plural regressors.
 print(f"Regressors X {X[:, 0]}")
 print(f"Regrassand y {y}")
 
